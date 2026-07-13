@@ -11,7 +11,7 @@
 
 由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M2.7 模型
 
-版本 2026.07.13a
+版本 2026.07.13b
 
 ## 示例
 横屏：<img width="1600" height="1318" alt="示例 - 横屏" src="https://github.com/user-attachments/assets/880ac625-595c-4855-9877-dffbe2aaf761" />
@@ -19,6 +19,8 @@
 
 
 ## 更新日志
+版本 2026.07.13b 添加【更新日志】按钮
+
 版本 2026.07.13a 发布本工具
 
 ## 免责声明
