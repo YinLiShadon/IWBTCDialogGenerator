@@ -1075,6 +1075,7 @@
                     <button class="btn-clear" onclick="resetCurrentConversation()">重置</button>
                     <button class="btn-export" onclick="showExportPreview()">导出图片</button>
                     <button class="btn-role-manager" onclick="showRoleManager()">角色管理</button>
+                    <button class="btn-changelog" onclick="showChangelogModal()" style="padding: 8px 16px; background: transparent; color: var(--text-color); border: 1px solid var(--btn-color); border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 12px;">更新日志</button>
                     <button class="btn-about" onclick="showAboutModal()">关于</button>
                 </div>
             </div>
@@ -1229,7 +1230,7 @@
             </div>
             <div style="text-align: center; padding: 20px;">
                 <h2 style="margin: 0 0 8px 0;">IWBTC Dialog Generator</h2>
-                <p style="color: #888; margin: 0 0 16px 0;">版本 2026.07.13a</p>
+                <p style="color: #888; margin: 0 0 16px 0;">版本 2026.07.13b</p>
                 <p style="line-height: 1.6;">《我想成为创造者》(I wanna be the Creator) 对话编辑器</p>
                 <p style="line-height: 1.6; margin-top: 8px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M2.7 模型</p>
                 <p style="line-height: 1.6; margin-top: 16px; text-align: left;">免责声明：</p>
@@ -1239,9 +1240,32 @@
                 <p style="line-height: 1.6; margin-top: 16px; text-align: left;">灵感来源：</p>
                 <p style="line-height: 1.6; text-align: left; color: #aaa;">1. 仿照微信、QQ聊天界面的工具</p>
                 <p style="line-height: 1.6; text-align: left; color: #aaa;">2. Yuzutalk/Momotalk (蔚蓝档案对话编辑器)：<a href="https://www.yuzutalk.net/" target="_blank" style="color: var(--btn-color);">https://www.yuzutalk.net/</a></p>
-                <p style="line-height: 1.6; text-align: left; color: #aaa;">3. MayerTalk (明日方舟对话编辑器)：<a href="https://www.mayertalk.top/" target="_blank" style="color: var(--btn-color);">https://www.mayertalk.top/</a></p>
+                <p style="line-height: 1.6; text-align: left; color: #aaa;">3. Closure Talk (明日方舟与蔚蓝档案对话编辑器)：<a href="https://closuretalk.github.io/" target="_blank" style="color: var(--btn-color);">https://closuretalk.github.io/</a></p>
+                <p style="line-height: 1.6; text-align: left; color: #aaa;">4. MayerTalk (明日方舟对话编辑器)：<a href="https://www.mayertalk.top/" target="_blank" style="color: var(--btn-color);">https://www.mayertalk.top/</a></p>
                 <p style="margin-top: 16px;"><a href="https://github.com/YinLiShadon/IWBTCDialogGenerator" target="_blank" style="display: inline-block; padding: 10px 20px; background: var(--btn-color); color: white; text-decoration: none; border-radius: 6px;">GitHub 仓库</a></p>
                 <p style="color: #888; font-size: 12px; margin-top: 20px;">© 2026 殷离Shadon</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 更新日志模态框 -->
+    <div class="modal" id="changelogModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <span class="modal-title">更新日志</span>
+                <button class="modal-close" onclick="closeModal('changelogModal')">&times;</button>
+            </div>
+            <div style="padding: 20px; max-height: 400px; overflow-y: auto;">
+                <h3 style="color: var(--btn-color); margin: 0 0 8px 0;">版本 2026.07.13b</h3>
+                <ul style="margin: 0 0 16px 0; padding-left: 20px; line-height: 1.8;">
+                    <li>添加【更新日志】按钮</li>
+                </ul>
+            </div>
+             <div style="padding: 20px; max-height: 400px; overflow-y: auto;">
+                <h3 style="color: var(--btn-color); margin: 0 0 8px 0;">版本 2026.07.13a</h3>
+                <ul style="margin: 0 0 16px 0; padding-left: 20px; line-height: 1.8;">
+                    <li>发布本工具</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -3077,6 +3101,10 @@
 
         function showAboutModal() {
             document.getElementById('aboutModal').classList.add('active');
+        }
+
+        function showChangelogModal() {
+            document.getElementById('changelogModal').classList.add('active');
         }
 
         // 点击模态框外部关闭
