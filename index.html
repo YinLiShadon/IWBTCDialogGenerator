@@ -1,0 +1,3101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IWBTC Dialog Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Han+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Liberation Sans';
+            src: local('Liberation Sans'), local('LiberationSans');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #04151E;
+            --sidebar-bg: #0D1F2D;
+            --self-bubble: #007ACC;
+            --other-bubble: #1E3A4D;
+            --role-bubble: #2D5A7B;
+            --narrator-color: #888888;
+            --text-color: #FFFFFF;
+            --input-bg: #0D1F2D;
+            --btn-color: #007ACC;
+        }
+
+        body {
+            font-family: 'Liberation Sans', 'Source Han Sans SC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        input, textarea, select {
+            font-family: 'Liberation Sans', 'Source Han Sans SC', sans-serif;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .chat-title-input {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-color);
+            font-size: 18px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: inherit;
+            max-width: 300px;
+        }
+
+        .chat-title-input:hover {
+            border-color: #444;
+        }
+
+        .chat-title-input:focus {
+            outline: none;
+            border-color: var(--btn-color);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .btn-clear {
+            background-color: transparent;
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+        }
+
+        .btn-clear:hover {
+            background-color: rgba(255,107,107,0.1);
+        }
+
+        .btn-export {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--btn-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+        }
+
+        .btn-export:hover {
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .image-preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .export-preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .export-preview-modal.active {
+            display: flex;
+        }
+
+        .export-preview-header {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .export-preview-header .aspect-ratio-btn {
+            padding: 8px 16px;
+            border: 1px solid #444;
+            background: #222;
+            color: #888;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Liberation Sans', 'Source Han Sans SC', sans-serif;
+        }
+
+        .export-preview-header .aspect-ratio-btn.active {
+            background: var(--btn-color);
+            color: white;
+            border-color: var(--btn-color);
+        }
+
+        .export-preview-content {
+            max-width: 90%;
+            max-height: 70vh;
+            overflow: auto;
+            border-radius: 8px;
+        }
+
+        .export-preview-content img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .export-preview-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .export-preview-actions button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Liberation Sans', 'Source Han Sans SC', sans-serif;
+        }
+
+        .export-preview-actions .btn-download {
+            background: var(--btn-color);
+            color: white;
+        }
+
+        .export-preview-actions .btn-cancel {
+            background: #444;
+            color: white;
+        }
+
+        .confirm-dialog-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .message-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .btn-new-chat {
+            background-color: #4a90d9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .btn-new-chat:hover {
+            background-color: #3a7fc8;
+        }
+
+        /* 主聊天区域 */
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 16px 24px;
+            background-color: var(--sidebar-bg);
+            border-bottom: 1px solid #1a2a3a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-role-manager {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--btn-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .btn-role-manager:hover {
+            background-color: var(--btn-color);
+        }
+
+        .btn-about {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--btn-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .btn-about:hover {
+            background-color: var(--btn-color);
+        }
+
+        /* 消息区域 */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-wrapper {
+            display: flex;
+            margin-bottom: 16px;
+            align-items: flex-start;
+        }
+
+        .message-wrapper.self {
+            flex-direction: row-reverse;
+        }
+
+        .message-wrapper.narrator {
+            justify-content: center;
+        }
+
+        .message-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            align-self: flex-start;
+        }
+
+        .message-wrapper.self .message-avatar {
+            margin-left: 12px;
+        }
+
+        .message-wrapper:not(.self):not(.narrator) .message-avatar {
+            margin-right: 12px;
+        }
+
+        .message-delete-btn {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .message-wrapper:hover .message-delete-btn {
+            opacity: 1;
+        }
+
+        .message-delete-btn:hover {
+            color: #ff6b6b;
+        }
+
+        .message-content-wrapper {
+            display: flex;
+            flex-direction: column;
+            max-width: 60%;
+        }
+
+        .message-wrapper.self .message-content-wrapper {
+            align-items: flex-end;
+        }
+
+        .message-wrapper:not(.self):not(.narrator) .message-content-wrapper {
+            align-items: flex-start;
+        }
+
+        .message-sender {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+
+        .message-bubble {
+            padding: 10px 14px;
+            border-radius: 12px;
+            word-wrap: break-word;
+        }
+
+        .message-wrapper.self .message-bubble {
+            background-color: var(--self-bubble);
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-wrapper:not(.self):not(.narrator) .message-bubble {
+            background-color: var(--other-bubble);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-wrapper.role .message-bubble {
+            background-color: var(--role-bubble);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 10px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .message-wrapper.narrator {
+            font-style: italic;
+            color: var(--narrator-color);
+            font-size: 14px;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        .message-content {
+            line-height: 1.5;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .message-file {
+            margin-top: 8px;
+            padding: 8px;
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .message-file img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .message-file a {
+            color: #7ec8ff;
+            text-decoration: none;
+        }
+
+        /* 输入区域 */
+        .input-area {
+            padding: 16px 24px;
+            padding-bottom: max(16px, calc(12px + env(safe-area-inset-bottom)));
+            background-color: var(--sidebar-bg);
+            border-top: 1px solid #1a2a3a;
+        }
+
+        .sender-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .sender-selector label {
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .sender-select {
+            display: none;
+        }
+
+        .custom-dropdown {
+            position: relative;
+            min-width: 180px;
+        }
+
+        .custom-dropdown-trigger {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--input-bg);
+            border: 2px solid #3a5a7a;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .custom-dropdown-trigger img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .custom-dropdown-trigger .trigger-text {
+            flex: 1;
+        }
+
+        .custom-dropdown-trigger .arrow {
+            font-size: 10px;
+            transition: transform 0.2s;
+        }
+
+        .custom-dropdown.open .custom-dropdown-trigger .arrow {
+            transform: rotate(180deg);
+        }
+
+        .custom-dropdown-menu {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: var(--sidebar-bg);
+            border: 2px solid #3a5a7a;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            z-index: 100;
+        }
+
+        .custom-dropdown.open .custom-dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-group-label {
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #888;
+            background-color: rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+
+        .dropdown-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .dropdown-option:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .dropdown-option.selected {
+            background-color: rgba(0, 120, 212, 0.3);
+        }
+
+        .dropdown-option img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .self-config {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 16px;
+            padding-left: 16px;
+            border-left: 1px solid #1a2a3a;
+        }
+
+        .self-config input {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 2px solid #3a5a7a;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: inherit;
+            width: 80px;
+        }
+
+        .self-avatar-preview {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .self-avatar-input {
+            display: none;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            margin-bottom: max(8px, env(safe-area-inset-bottom));
+        }
+
+        .btn-file {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 2px solid #3a5a7a;
+            padding: 10px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-file:hover {
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .message-input {
+            flex: 1;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 2px solid #3a5a7a;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: var(--btn-color);
+        }
+
+        .btn-send {
+            background-color: var(--btn-color);
+            color: white;
+            border: 2px solid #0078d4;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .btn-send:hover {
+            background-color: #0098e6;
+        }
+
+        .btn-undo, .btn-redo {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--btn-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .btn-undo:hover, .btn-redo:hover {
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .file-preview {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .file-preview-item {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+
+        .file-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .file-preview-item .remove-file {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 20px;
+            height: 20px;
+            background-color: #ff6b6b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .file-preview-item .file-icon {
+            width: 100%;
+            height: 100%;
+            background-color: var(--input-bg);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            text-align: center;
+            padding: 4px;
+            word-break: break-all;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--sidebar-bg);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* 角色管理 */
+        .role-section {
+            margin-bottom: 24px;
+        }
+
+        .role-section h3 {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 12px;
+        }
+
+        .role-category {
+            margin-bottom: 16px;
+        }
+
+        .role-category h4 {
+            font-size: 12px;
+            color: #888;
+            margin: 8px 0;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 12px;
+        }
+
+        .role-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            background-color: var(--input-bg);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .role-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .role-item img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 8px;
+        }
+
+        .role-item span {
+            font-size: 12px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+        }
+
+        /* 新建角色表单 */
+        .create-role-form {
+            display: none;
+            background-color: var(--input-bg);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .create-role-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid #1a2a3a;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .avatar-upload {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-upload img {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .avatar-upload input[type="file"] {
+            display: none;
+        }
+
+        .btn-upload-avatar {
+            background-color: var(--btn-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .btn-create-role {
+            background-color: var(--btn-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            margin-top: 12px;
+        }
+
+        .btn-create-role:hover {
+            background-color: #0098e6;
+        }
+
+        /* 新建对话 */
+        .new-chat-modal .modal-content {
+            max-width: 400px;
+        }
+
+        .new-chat-modal input {
+            width: 100%;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 2px solid #3a5a7a;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .new-chat-modal input:focus {
+            outline: none;
+            border-color: var(--btn-color);
+        }
+
+        .new-chat-modal .btn-create {
+            width: 100%;
+            margin-top: 16px;
+            background-color: var(--btn-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .new-chat-modal .btn-create:hover {
+            background-color: #0098e6;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .empty-state p {
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1a2a3a;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2a3a4a;
+        }
+
+        /* 隐藏的文件输入 */
+        .hidden-input {
+            display: none;
+        }
+
+        /* Toast 提示框 */
+        .toast-container {
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background-color: var(--sidebar-bg);
+            color: var(--text-color);
+            padding: 14px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            font-size: 14px;
+            animation: toastIn 0.3s ease;
+            border-left: 4px solid var(--btn-color);
+        }
+
+        .toast.success {
+            border-left-color: #4CAF50;
+        }
+
+        .toast.error {
+            border-left-color: #f44336;
+        }
+
+        .toast.info {
+            border-left-color: #2196F3;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+        }
+
+        /* 自定义确认对话框 */
+        .confirm-dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm-dialog {
+            background-color: var(--sidebar-bg);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 360px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .confirm-dialog-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .confirm-dialog-message {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .confirm-dialog-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .confirm-dialog-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .confirm-dialog-btn.cancel {
+            background-color: #444;
+            color: #fff;
+        }
+
+        .confirm-dialog-btn.cancel:hover {
+            background-color: #555;
+        }
+
+        .confirm-dialog-btn.confirm {
+            background-color: #f44336;
+            color: #fff;
+        }
+
+        .confirm-dialog-btn.confirm:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 主聊天区域 -->
+        <div class="main-chat">
+            <div class="chat-header">
+                <input type="text" class="chat-title-input" id="chatTitleInput" value="IWBTC Dialog Generator" onclick="event.stopPropagation();" onkeydown="handleTitleKeydown(event)" onblur="handleTitleBlur()">
+                <div class="chat-header-actions">
+                    <button class="btn-select-messages" onclick="toggleMessageSelectionMode()" style="padding: 8px 16px; background: transparent; color: var(--text-color); border: 1px solid var(--btn-color); border-radius: 4px; cursor: pointer;">☑️ 选择</button>
+                    <button class="btn-undo" onclick="undoDelete()" title="撤销">↩️ 撤销</button>
+                    <button class="btn-redo" onclick="redoDelete()" title="重做">↪️ 重做</button>
+                    <button class="btn-clear" onclick="clearCurrentConversation()">清屏</button>
+                    <button class="btn-export" onclick="showExportPreview()">导出图片</button>
+                    <button class="btn-role-manager" onclick="showRoleManager()">角色管理</button>
+                    <button class="btn-about" onclick="showAboutModal()">关于</button>
+                </div>
+            </div>
+            <div class="messages-container" id="messagesContainer"></div>
+            <div class="input-area" id="inputArea">
+                <div class="sender-selector" style="margin-bottom: 8px;">
+                    <label>发送者：</label>
+                        <div class="custom-dropdown" id="senderDropdown">
+                            <div class="custom-dropdown-trigger" onclick="toggleSenderDropdown(event)">
+                                <img id="dropdownSelectedAvatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='24' fill='%23666'/%3E%3C/svg%3E" alt="">
+                                <span class="trigger-text" id="dropdownSelectedText">自己</span>
+                                <span class="arrow">▼</span>
+                            </div>
+                            <div class="custom-dropdown-menu" id="senderDropdownMenu"></div>
+                        </div>
+                        <select class="sender-select" id="senderSelect" onchange="onSenderChange()">
+                            <optgroup label="自己">
+                                <option value="self">自己</option>
+                            </optgroup>
+                            <optgroup label="旁白">
+                                <option value="narrator">旁白</option>
+                            </optgroup>
+                            <optgroup label="预设角色" id="presetRolesGroup"></optgroup>
+                            <optgroup label="自定义角色" id="customRolesGroup"></optgroup>
+                        </select>
+                        <div class="self-config" id="selfConfig">
+                            <img class="self-avatar-preview" id="selfAvatarPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='24' fill='%23666'/%3E%3C/svg%3E" alt="">
+                            <input type="file" class="self-avatar-input" id="selfAvatarInput" accept="image/*" onchange="onSelfAvatarChange()">
+                            <span onclick="document.getElementById('selfAvatarInput').click()" style="cursor:pointer;font-size:12px;">[换头像]</span>
+                            <input type="text" id="selfName" placeholder="我的名字" value="我">
+                        </div>
+                    </div>
+                <div class="file-preview" id="filePreview"></div>
+                <input type="file" class="hidden-input" id="fileInput" multiple accept="image/*" onchange="onFileSelect()">
+                <div class="input-row">
+                    <button class="btn-file" onclick="document.getElementById('fileInput').click()">🖼️ 图片</button>
+                    <textarea class="message-input" id="messageInput" placeholder="输入消息..." rows="1" onkeydown="handleKeyDown(event)"></textarea>
+                    <button class="btn-send" onclick="sendMessage().catch(console.error)">发送</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新建对话模态框 -->
+    <div class="modal new-chat-modal" id="newChatModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">新建对话</span>
+                <button class="modal-close" onclick="closeModal('newChatModal')">&times;</button>
+            </div>
+            <input type="text" id="newChatName" placeholder="输入对话名称">
+            <button class="btn-create" onclick="createConversation()">创建</button>
+        </div>
+    </div>
+
+    <!-- 角色管理模态框 -->
+    <div class="modal" id="roleManagerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">角色管理</span>
+                <button class="modal-close" onclick="closeModal('roleManagerModal')">&times;</button>
+            </div>
+
+            <div class="role-section">
+                <h3>自己</h3>
+                <div class="role-grid" id="selfRolesGrid"></div>
+            </div>
+
+            <div class="role-section">
+                <h3>旁白</h3>
+                <div class="role-grid" id="narratorRolesGrid"></div>
+            </div>
+
+            <div class="role-section">
+                <h3>预设角色</h3>
+                <div id="presetRolesCategories"></div>
+            </div>
+
+            <div class="role-section">
+                <h3>自定义角色</h3>
+                <div id="customRolesCategories"></div>
+                <button class="btn-create-role" onclick="toggleCreateRoleForm()" style="margin-top:12px;">+ 创建新角色</button>
+                <div class="create-role-form" id="createRoleForm">
+                    <div class="form-group">
+                        <label>角色分类</label>
+                        <input type="text" id="newRoleCategory" placeholder="输入角色分类，如：游戏角色">
+                    </div>
+                    <div class="form-group">
+                        <label>角色名称</label>
+                        <input type="text" id="newRoleName" placeholder="输入角色名称">
+                    </div>
+                    <div class="form-group">
+                        <label>角色头像</label>
+                        <div class="avatar-upload">
+                            <img id="newRoleAvatarPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%23666'/%3E%3C/svg%3E" alt="">
+                            <input type="file" id="newRoleAvatarInput" accept="image/*" onchange="onNewRoleAvatarChange()">
+                            <button class="btn-upload-avatar" onclick="document.getElementById('newRoleAvatarInput').click()">选择图片</button>
+                        </div>
+                    </div>
+                    <button class="btn-create-role" onclick="createCustomRole()">确认创建</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 容器 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 图片预览模态框 -->
+    <div class="image-preview-modal" id="imagePreviewModal" onclick="closeImagePreview()">
+        <button class="close-btn" onclick="closeImagePreview()">✕</button>
+        <img id="imagePreviewContent" src="" alt="预览">
+    </div>
+
+    <!-- 导出预览模态框 -->
+    <div class="export-preview-modal" id="exportPreviewModal">
+        <div class="export-preview-header">
+            <div style="text-align: center; margin-bottom: 12px;">
+                <div style="font-size: 20px; font-weight: bold; color: var(--text-color);">导出图片</div>
+            </div>
+            <div style="text-align: center; margin-bottom: 8px; font-size: 13px; color: #888;">选择比例</div>
+            <div style="display: flex; justify-content: center; gap: 8px;">
+                <button class="aspect-ratio-btn" data-ratio="16:9" onclick="setExportPreviewRatio('16:9')">横屏</button>
+                <button class="aspect-ratio-btn" data-ratio="9:16" onclick="setExportPreviewRatio('9:16')">竖屏</button>
+            </div>
+        </div>
+        <div class="export-preview-content" id="exportPreviewContent"></div>
+        <div class="export-preview-actions">
+            <button class="btn-cancel" onclick="closeExportPreview()">取消</button>
+            <button class="btn-download" onclick="confirmExportImage()">下载</button>
+        </div>
+    </div>
+
+    <!-- 自定义确认对话框 -->
+    <div class="confirm-dialog-overlay" id="confirmDialogOverlay" style="display: none;">
+        <div class="confirm-dialog">
+            <div class="confirm-dialog-title" id="confirmDialogTitle">确认</div>
+            <div class="confirm-dialog-message" id="confirmDialogMessage">确定要执行此操作吗？</div>
+            <div class="confirm-dialog-buttons">
+                <button class="confirm-dialog-btn cancel" onclick="closeConfirmDialog(false)">取消</button>
+                <button class="confirm-dialog-btn confirm" onclick="closeConfirmDialog(true)">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 关于模态框 -->
+    <div class="modal" id="aboutModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <span class="modal-title">关于</span>
+                <button class="modal-close" onclick="closeModal('aboutModal')">&times;</button>
+            </div>
+            <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">💬</div>
+                <h2 style="margin: 0 0 8px 0;">IWBTC Dialog Generator</h2>
+                <p style="color: #888; margin: 0 0 16px 0;">版本 1.0.0</p>
+                <p style="line-height: 1.6;">一个简洁的聊天应用，支持多角色对话、自定义角色、消息导出等功能。</p>
+                <p style="margin-top: 16px;"><a href="https://github.com/iwbtc/dialog-generator" target="_blank" style="display: inline-block; padding: 10px 20px; background: var(--btn-color); color: white; text-decoration: none; border-radius: 6px;">GitHub 仓库</a></p>
+                <p style="color: #888; font-size: 12px; margin-top: 20px;">© 2024 IWBTC</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑自己信息模态框 -->
+    <div class="modal" id="editSelfModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <span class="modal-title">编辑自己</span>
+                <button class="modal-close" onclick="closeModal('editSelfModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>名称</label>
+                <input type="text" id="editSelfName" placeholder="输入名称">
+            </div>
+            <div class="form-group">
+                <label>头像</label>
+                <div class="avatar-upload">
+                    <img id="editSelfAvatarPreview" src="" alt="">
+                    <input type="file" id="editSelfAvatarInput" accept="image/*" onchange="onEditSelfAvatarChange()">
+                    <button class="btn-upload-avatar" onclick="document.getElementById('editSelfAvatarInput').click()">选择图片</button>
+                </div>
+            </div>
+            <button class="btn-create-role" onclick="saveSelfEdit()">保存</button>
+        </div>
+    </div>
+
+    <!-- 编辑自定义角色模态框 -->
+    <div class="modal" id="editCustomRoleModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <span class="modal-title">编辑角色</span>
+                <button class="modal-close" onclick="closeModal('editCustomRoleModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>名称</label>
+                <input type="text" id="editCustomRoleName" placeholder="输入名称">
+            </div>
+            <div class="form-group">
+                <label>分类</label>
+                <input type="text" id="editCustomRoleCategory" placeholder="输入分类">
+            </div>
+            <div class="form-group">
+                <label>头像</label>
+                <div class="avatar-upload">
+                    <img id="editCustomRoleAvatarPreview" src="" alt="">
+                    <input type="file" id="editCustomRoleAvatarInput" accept="image/*" onchange="onEditCustomRoleAvatarChange()">
+                    <button class="btn-upload-avatar" onclick="document.getElementById('editCustomRoleAvatarInput').click()">选择图片</button>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-create-role" onclick="saveCustomRoleEdit()" style="flex:1;">保存</button>
+                <button class="btn-create-role" onclick="confirmDeleteCustomRole()" style="flex:1; background-color: #d32f2f;">删除</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>
+        // 数据结构
+        let conversations = [];
+        let currentConversationId = null;
+        let presetRoles = [];
+        let customRoles = JSON.parse(localStorage.getItem('customRoles') || '[]');
+        let selfConfig = JSON.parse(localStorage.getItem('selfConfig') || '{"name":"我","avatar":""}');
+        let selectedFiles = [];
+        let currentSenderValue = 'self';
+        let deletedMessages = [];
+        let redoMessages = [];
+        let messageSelectionMode = false;
+        let selectedMessages = new Set();
+
+        // Toast 提示
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'toastOut 0.3s ease forwards';
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // 自定义确认对话框
+        let confirmDialogCallback = null;
+
+        function showConfirmDialog(title, message) {
+            return new Promise((resolve) => {
+                document.getElementById('confirmDialogTitle').textContent = title;
+                document.getElementById('confirmDialogMessage').textContent = message;
+                document.getElementById('confirmDialogOverlay').style.display = 'flex';
+                confirmDialogCallback = resolve;
+            });
+        }
+
+        function closeConfirmDialog(result) {
+            document.getElementById('confirmDialogOverlay').style.display = 'none';
+            if (confirmDialogCallback) {
+                confirmDialogCallback(result);
+                confirmDialogCallback = null;
+            }
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', async () => {
+            loadConversations();
+            await loadPresetRoles();
+            renderRoleManager();
+            renderSenderDropdown();
+            updateSelfConfig();
+
+            const lastConversationId = localStorage.getItem('lastConversationId');
+            if (lastConversationId && conversations.some(c => c.id === lastConversationId)) {
+                await selectConversation(lastConversationId);
+            } else if (conversations.length > 0) {
+                await selectConversation(conversations[0].id);
+            }
+        });
+
+        // 加载对话
+        function loadConversations() {
+            const saved = localStorage.getItem('conversations');
+            if (saved) {
+                conversations = JSON.parse(saved);
+            }
+        }
+
+        // 保存对话
+        function saveConversations() {
+            localStorage.setItem('conversations', JSON.stringify(conversations));
+        }
+
+        // 加载预设角色
+        async function loadPresetRoles() {
+            presetRoles = [];
+            const basePath = 'Character/';
+            const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp'];
+
+            // 尝试使用 fetch 读取目录（需要服务器开启目录浏览）
+            try {
+                const response = await fetch(basePath);
+                if (response.ok) {
+                    const text = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(text, 'text/html');
+                    const links = doc.querySelectorAll('a');
+                    const folders = {};
+                    const rootImages = [];
+
+                    for (const link of links) {
+                        const href = link.getAttribute('href');
+                        if (!href || href.startsWith('?') || href === '../') continue;
+
+                        if (href.endsWith('/')) {
+                            // 子文件夹
+                            const folderName = href.replace(/\/$/, '');
+                            folders[folderName] = [];
+                        } else {
+                            // 根目录的图片
+                            const ext = href.substring(href.lastIndexOf('.')).toLowerCase();
+                            if (imageExtensions.includes(ext)) {
+                                rootImages.push(href);
+                            }
+                        }
+                    }
+
+                    // 读取子文件夹中的图片
+                    for (const folder of Object.keys(folders)) {
+                        try {
+                            const folderResponse = await fetch(basePath + folder + '/');
+                            const folderText = await folderResponse.text();
+                            const folderDoc = parser.parseFromString(folderText, 'text/html');
+                            const folderLinks = folderDoc.querySelectorAll('a');
+
+                            for (const link of folderLinks) {
+                                const href = link.getAttribute('href');
+                                if (!href || href.startsWith('?') || href === '../' || href.endsWith('/')) continue;
+
+                                const ext = href.substring(href.lastIndexOf('.')).toLowerCase();
+                                if (imageExtensions.includes(ext)) {
+                                    folders[folder].push(href);
+                                }
+                            }
+                        } catch (e) {
+                            console.warn(`读取 ${folder} 文件夹失败:`, e);
+                        }
+                    }
+
+                    // 如果获取到任何文件，使用动态加载
+                    const totalFiles = Object.values(folders).flat().length + rootImages.length;
+                    if (totalFiles > 0) {
+                        // 处理子文件夹中的图片
+                        for (const [folder, files] of Object.entries(folders)) {
+                            for (const file of files) {
+                                const name = file.replace(/\.[^/.]+$/, '');
+                                const avatarPath = basePath + folder + '/' + file;
+                                const avatarDataUrl = await imageToDataURL(avatarPath);
+                                presetRoles.push({
+                                    id: `preset_${name}`,
+                                    name: name,
+                                    avatar: avatarDataUrl,
+                                    type: 'preset',
+                                    category: folder
+                                });
+                            }
+                        }
+                        // 处理根目录图片
+                        for (const file of rootImages) {
+                            const name = file.replace(/\.[^/.]+$/, '');
+                            const avatarPath = basePath + file;
+                            const avatarDataUrl = await imageToDataURL(avatarPath);
+                            presetRoles.push({
+                                id: `preset_${name}`,
+                                name: name,
+                                avatar: avatarDataUrl,
+                                type: 'preset',
+                                category: '预设角色'
+                            });
+                        }
+                        console.log(`加载了 ${presetRoles.length} 个预设角色`);
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('Fetch 方式读取失败:', e);
+            }
+
+            // 回退到硬编码列表
+            await loadPresetRolesFallback();
+        }
+
+        async function loadPresetRolesFallback() {
+            const basePath = 'Character/';
+            const folders = {
+                'IC玩家': ['AikesiX.png'],
+                '游戏角色': [
+                    'Kid.png', '兔兔.png', '冰雪散人.png', '剑客散人.png', '圣诞散人.png',
+                    '夏日水果.png', '小刺.png', '小机器人.png', '小狼(旧).png', '小狼.png',
+                    '小草.png', '小鞭炮.png', '幽灵Kid.png', '探险者散人.png', '散人.png',
+                    '散娘.png', '水果猫.png', '特若.png', '猫耳散人.png', '福散.png',
+                    '窗花散人.png', '纯色Kid.png', '纯色散人.png', '线条Kid.png', '线条散人.png',
+                    '蜗牛小G.png', '雪花散人.png'
+                ]
+            };
+
+            for (const [folder, files] of Object.entries(folders)) {
+                for (const file of files) {
+                    const name = file.replace(/\.[^/.]+$/, '');
+                    const avatarPath = basePath + folder + '/' + file;
+                    const avatarDataUrl = await imageToDataURL(avatarPath);
+                    presetRoles.push({
+                        id: `preset_${name}`,
+                        name: name,
+                        avatar: avatarDataUrl,
+                        type: 'preset',
+                        category: folder
+                    });
+                }
+            }
+        }
+
+        // 选择对话
+        async function selectConversation(id) {
+            if (selectedFiles.length > 0) {
+                const confirmed = await showConfirmDialog('切换对话', '当前有未发送的文件，切换对话将清除这些文件，确定要切换吗？');
+                if (!confirmed) return;
+                filePreviewCache.forEach(url => URL.revokeObjectURL(url));
+                filePreviewCache.clear();
+                selectedFiles = [];
+                renderFilePreview();
+            }
+            currentConversationId = id;
+            localStorage.setItem('lastConversationId', id);
+            renderMessages();
+            const conv = conversations.find(c => c.id === id);
+            document.getElementById('chatTitleInput').value = conv ? conv.name : 'IWBTC Dialog Generator';
+            showToast(`已加载对话：${conv.name}`, 'info');
+        }
+
+        function handleTitleKeydown(event) {
+            if (event.key === 'Enter') {
+                event.target.blur();
+            }
+        }
+
+        function handleTitleBlur() {
+            const newName = document.getElementById('chatTitleInput').value.trim();
+            if (!newName) {
+                document.getElementById('chatTitleInput').value = 'IWBTC Dialog Generator';
+            }
+            if (currentConversationId) {
+                const conv = conversations.find(c => c.id === currentConversationId);
+                if (conv) {
+                    conv.name = newName || 'IWBTC Dialog Generator';
+                    saveConversations();
+                }
+            }
+        }
+
+        async function clearCurrentConversation() {
+            if (!currentConversationId) {
+                showToast('请先选择一个对话', 'error');
+                return;
+            }
+            const confirmed = await showConfirmDialog('清屏', '确定要清空当前对话的所有消息吗？');
+            if (!confirmed) return;
+            const conv = conversations.find(c => c.id === currentConversationId);
+            if (conv && conv.messages && conv.messages.length > 0) {
+                const clearedMessages = [...conv.messages];
+                conv.messages = [];
+                deletedMessages.push({ convId: currentConversationId, message: clearedMessages, isClear: true });
+                redoMessages = [];
+                saveConversations();
+                renderMessages();
+                showToast('对话已清空，可撤销', 'success');
+            } else if (conv) {
+                conv.messages = [];
+                saveConversations();
+                renderMessages();
+                showToast('对话已清空', 'success');
+            }
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const seconds = date.getSeconds().toString().padStart(2, '0');
+            return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        function getAvatarForSender(sender) {
+            const defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 48 48\'%3E%3Ccircle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23666\'/%3E%3C/svg%3E';
+            if (sender.avatar && sender.avatar.startsWith('data:image/png') || sender.avatar && sender.avatar.startsWith('data:image/jpeg') || sender.avatar && sender.avatar.startsWith('data:image/gif') || sender.avatar && sender.avatar.startsWith('data:image/webp')) {
+                return sender.avatar;
+            }
+            if (sender.type === 'preset') {
+                const role = presetRoles.find(r => r.name === sender.name);
+                if (role && role.avatar && role.avatar.startsWith('data:image')) {
+                    return role.avatar;
+                }
+                const folders = {
+                    'IC玩家': ['AikesiX.png'],
+                    '游戏角色': [
+                        'Kid.png', '兔兔.png', '冰雪散人.png', '剑客散人.png', '圣诞散人.png',
+                        '夏日水果.png', '小刺.png', '小机器人.png', '小狼(旧).png', '小狼.png',
+                        '小草.png', '小鞭炮.png', '幽灵Kid.png', '探险者散人.png', '散人.png',
+                        '散娘.png', '水果猫.png', '特若.png', '猫耳散人.png', '福散.png',
+                        '窗花散人.png', '纯色Kid.png', '纯色散人.png', '线条Kid.png', '线条散人.png',
+                        '蜗牛小G.png', '雪花散人.png'
+                    ]
+                };
+                for (const [folder, files] of Object.entries(folders)) {
+                    for (const file of files) {
+                        const fileName = file.replace(/\.[^/.]+$/, '');
+                        if (fileName === sender.name) {
+                            const path = 'Character/' + folder + '/' + file;
+                            return path;
+                        }
+                    }
+                }
+            } else if (sender.type === 'custom') {
+                const role = customRoles.find(r => r.id === sender.id);
+                if (role && role.avatar) return role.avatar;
+            }
+            return defaultAvatar;
+        }
+
+        function getPresetAvatarPath(name) {
+            const folders = {
+                'IC玩家': ['AikesiX.png'],
+                '游戏角色': [
+                    'Kid.png', '兔兔.png', '冰雪散人.png', '剑客散人.png', '圣诞散人.png',
+                    '夏日水果.png', '小刺.png', '小机器人.png', '小狼(旧).png', '小狼.png',
+                    '小草.png', '小鞭炮.png', '幽灵Kid.png', '探险者散人.png', '散人.png',
+                    '散娘.png', '水果猫.png', '特若.png', '猫耳散人.png', '福散.png',
+                    '窗花散人.png', '纯色Kid.png', '纯色散人.png', '线条Kid.png', '线条散人.png',
+                    '蜗牛小G.png', '雪花散人.png'
+                ]
+            };
+            for (const [folder, files] of Object.entries(folders)) {
+                for (const file of files) {
+                    const fileName = file.replace(/\.[^/.]+$/, '');
+                    if (fileName === name) {
+                        return 'Character/' + folder + '/' + file;
+                    }
+                }
+            }
+            return null;
+        }
+
+        // 渲染消息
+        function renderMessages() {
+            const container = document.getElementById('messagesContainer');
+            const conv = conversations.find(c => c.id === currentConversationId);
+
+            if (!conv || !conv.messages || conv.messages.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>开始发送消息吧</p></div>';
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+
+            conv.messages.forEach(msg => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'message-wrapper';
+                wrapper.dataset.msgId = msg.id;
+
+                if (msg.sender.type === 'narrator') {
+                    wrapper.classList.add('narrator');
+                    const checkboxHtml = messageSelectionMode ? `<input type="checkbox" class="message-checkbox" ${selectedMessages.has(msg.id) ? 'checked' : ''} onchange="toggleMessageSelection('${msg.id}')">` : '';
+                    wrapper.innerHTML = `
+                        ${checkboxHtml}
+                        <div class="message-bubble">${msg.content}</div>
+                        ${!messageSelectionMode ? `<button class="message-delete-btn" onclick="deleteMessage('${msg.id}').catch(console.error)">🗑️</button>` : ''}
+                    `;
+                } else if (msg.sender.type === 'self') {
+                    wrapper.classList.add('self');
+                    const avatar = selfConfig.avatar || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 48 48\'%3E%3Ccircle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23666\'/%3E%3C/svg%3E';
+                    const checkboxHtml = messageSelectionMode ? `<input type="checkbox" class="message-checkbox" ${selectedMessages.has(msg.id) ? 'checked' : ''} onchange="toggleMessageSelection('${msg.id}')">` : '';
+                    wrapper.innerHTML = `
+                        ${checkboxHtml}
+                        <img class="message-avatar" src="${avatar}" alt="">
+                        <div class="message-content-wrapper">
+                            ${msg.sender.name !== '我' ? `<div class="message-sender">${msg.sender.name}</div>` : ''}
+                            <div class="message-bubble">
+                                <div class="message-content">${msg.content || ''}</div>
+                                ${renderFiles(msg.files)}
+                            </div>
+                            <div class="message-time">${formatTime(msg.timestamp)}</div>
+                        </div>
+                        ${!messageSelectionMode ? `<button class="message-delete-btn" onclick="deleteMessage('${msg.id}').catch(console.error)">🗑️</button>` : ''}
+                    `;
+                } else {
+                    if (msg.sender.type === 'preset' || msg.sender.type === 'custom') {
+                        wrapper.classList.add('role');
+                    }
+                    const checkboxHtml = messageSelectionMode ? `<input type="checkbox" class="message-checkbox" ${selectedMessages.has(msg.id) ? 'checked' : ''} onchange="toggleMessageSelection('${msg.id}')">` : '';
+                    wrapper.innerHTML = `
+                        ${!messageSelectionMode ? `<button class="message-delete-btn" onclick="deleteMessage('${msg.id}').catch(console.error)">🗑️</button>` : ''}
+                        ${checkboxHtml}
+                        <img class="message-avatar" src="${getAvatarForSender(msg.sender)}" alt="">
+                        <div class="message-content-wrapper">
+                            <div class="message-sender">${msg.sender.name}</div>
+                            <div class="message-bubble">
+                                <div class="message-content">${msg.content || ''}</div>
+                                ${renderFiles(msg.files)}
+                            </div>
+                            <div class="message-time">${formatTime(msg.timestamp)}</div>
+                        </div>
+                    `;
+                }
+
+                fragment.appendChild(wrapper);
+            });
+
+            container.innerHTML = '';
+            container.appendChild(fragment);
+
+            container.querySelectorAll('.previewable-image').forEach(img => {
+                img.addEventListener('click', () => {
+                    const previewSrc = decodeURIComponent(img.dataset.preview);
+                    showImagePreview(previewSrc);
+                });
+            });
+
+            requestAnimationFrame(() => {
+                container.scrollTop = container.scrollHeight;
+            });
+        }
+
+        // 渲染文件
+        function renderFiles(files) {
+            if (!files || files.length === 0) return '';
+
+            let html = '';
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    html += `<div class="message-file"><img src="${file.data}" alt="${file.name}" data-preview="${encodeURIComponent(file.data)}" class="previewable-image"></div>`;
+                } else {
+                    html += `<div class="message-file"><span>📄</span><a href="${file.data}" download="${file.name}">${file.name}</a></div>`;
+                }
+            });
+            return html;
+        }
+
+        async function deleteMessage(msgId) {
+            const confirmed = await showConfirmDialog('删除消息', '确定删除此消息？删除后可撤销恢复。');
+            if (!confirmed) return;
+
+            const conv = conversations.find(c => c.id === currentConversationId);
+            if (!conv || !conv.messages) return;
+
+            const msgIndex = conv.messages.findIndex(m => m.id === msgId);
+            if (msgIndex === -1) return;
+
+            const deletedMsg = conv.messages.splice(msgIndex, 1)[0];
+            deletedMessages.push({ convId: currentConversationId, message: deletedMsg, index: msgIndex });
+            redoMessages = [];
+
+            saveConversations();
+            renderMessages();
+            showToast('消息已删除', 'info');
+        }
+
+        function undoDelete() {
+            console.log('Undo called, deletedMessages length:', deletedMessages.length);
+            if (deletedMessages.length === 0) {
+                showToast('没有可撤销的操作', 'info');
+                return;
+            }
+
+            const lastDeleted = deletedMessages.pop();
+            console.log('Undoing:', lastDeleted);
+            const conv = conversations.find(c => c.id === lastDeleted.convId);
+            if (!conv) {
+                console.error('Conversation not found:', lastDeleted.convId);
+                showToast('撤销失败：对话不存在', 'error');
+                return;
+            }
+
+            if (!conv.messages) {
+                conv.messages = [];
+            }
+
+            if (lastDeleted.isClear) {
+                const restoredMessages = lastDeleted.message;
+                conv.messages = restoredMessages;
+                redoMessages.push(lastDeleted);
+            } else if (lastDeleted.isSent) {
+                const msgIndex = conv.messages.findIndex(m => m.id === lastDeleted.message.id);
+                if (msgIndex !== -1) {
+                    conv.messages.splice(msgIndex, 1);
+                    redoMessages.push(lastDeleted);
+                }
+            } else {
+                let insertIndex = conv.messages.findIndex(m => m.timestamp > lastDeleted.message.timestamp);
+                if (insertIndex === -1) insertIndex = conv.messages.length;
+                conv.messages.splice(insertIndex, 0, lastDeleted.message);
+                redoMessages.push(lastDeleted);
+            }
+
+            console.log('Message restored, messages count:', conv.messages.length);
+            saveConversations();
+            if (lastDeleted.convId === currentConversationId) {
+                renderMessages();
+            }
+            showToast('消息已撤销', 'success');
+        }
+
+        function redoDelete() {
+            console.log('Redo called, redoMessages length:', redoMessages.length);
+            if (redoMessages.length === 0) {
+                showToast('没有可重做的操作', 'info');
+                return;
+            }
+
+            const lastRedo = redoMessages.pop();
+            console.log('Redoing:', lastRedo);
+            const conv = conversations.find(c => c.id === lastRedo.convId);
+            if (!conv) {
+                console.error('Conversation not found:', lastRedo.convId);
+                showToast('重做失败：对话不存在', 'error');
+                return;
+            }
+
+            if (lastRedo.isClear) {
+                conv.messages = [];
+                deletedMessages.push(lastRedo);
+            } else if (lastRedo.isSent) {
+                let insertIndex = conv.messages.findIndex(m => m.timestamp > lastRedo.message.timestamp);
+                if (insertIndex === -1) insertIndex = conv.messages.length;
+                conv.messages.splice(insertIndex, 0, lastRedo.message);
+                deletedMessages.push(lastRedo);
+            } else {
+                const msgIndex = conv.messages.findIndex(m => m.id === lastRedo.message.id);
+                if (msgIndex !== -1) {
+                    conv.messages.splice(msgIndex, 1);
+                    deletedMessages.push(lastRedo);
+                }
+            }
+
+            saveConversations();
+            if (lastRedo.convId === currentConversationId) {
+                renderMessages();
+            }
+            showToast('消息已恢复', 'success');
+        }
+
+        function toggleMessageSelectionMode() {
+            messageSelectionMode = !messageSelectionMode;
+            selectedMessages.clear();
+            renderMessages();
+            updateMessageSelectionUI();
+        }
+
+        function updateMessageSelectionUI() {
+            let toolbar = document.getElementById('messageSelectionToolbar');
+            if (!toolbar) {
+                toolbar = document.createElement('div');
+                toolbar.id = 'messageSelectionToolbar';
+                toolbar.className = 'selection-toolbar';
+                toolbar.style.cssText = 'display: flex; gap: 8px; padding: 8px; background: var(--sidebar-bg); border-bottom: 1px solid #1a2a3a;';
+                const messagesContainer = document.getElementById('messagesContainer');
+                messagesContainer.parentNode.insertBefore(toolbar, messagesContainer);
+            }
+            toolbar.style.display = messageSelectionMode ? 'flex' : 'none';
+            toolbar.innerHTML = `
+                <span style="color: var(--text-color);">已选择 ${selectedMessages.size} 条消息</span>
+                <button class="btn-delete-selected" onclick="deleteSelectedMessages()" style="background: #ff6b6b; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">删除</button>
+                <button class="btn-cancel-selection" onclick="toggleMessageSelectionMode()" style="background: #666; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">取消</button>
+            `;
+        }
+
+        function toggleMessageSelection(msgId) {
+            if (selectedMessages.has(msgId)) {
+                selectedMessages.delete(msgId);
+            } else {
+                selectedMessages.add(msgId);
+            }
+            const wrapper = document.querySelector(`[data-msg-id="${msgId}"]`);
+            if (wrapper) {
+                const checkbox = wrapper.querySelector('.message-checkbox');
+                if (checkbox) {
+                    checkbox.checked = selectedMessages.has(msgId);
+                }
+            }
+            updateMessageSelectionUI();
+        }
+
+        async function deleteSelectedMessages() {
+            if (selectedMessages.size === 0) return;
+            const confirmed = await showConfirmDialog('删除消息', `确定删除选中的 ${selectedMessages.size} 条消息？`);
+            if (!confirmed) return;
+
+            const conv = conversations.find(c => c.id === currentConversationId);
+            if (!conv) return;
+
+            const deletedMsgs = [];
+            const indicesToDelete = [];
+            selectedMessages.forEach(msgId => {
+                const msgIndex = conv.messages.findIndex(m => m.id === msgId);
+                if (msgIndex !== -1) {
+                    indicesToDelete.push(msgIndex);
+                    deletedMsgs.push({ message: conv.messages[msgIndex], index: msgIndex });
+                }
+            });
+
+            indicesToDelete.sort((a, b) => b - a).forEach(idx => {
+                conv.messages.splice(idx, 1);
+            });
+
+            deletedMessages.push(...deletedMsgs.map(d => ({ convId: currentConversationId, message: d.message, index: d.index })));
+            redoMessages = [];
+
+            saveConversations();
+            messageSelectionMode = false;
+            selectedMessages.clear();
+            renderMessages();
+            updateMessageSelectionUI();
+            showToast(`已删除 ${deletedMsgs.length} 条消息`, 'info');
+        }
+
+        // 新建对话
+        function showNewChatModal() {
+            document.getElementById('newChatModal').classList.add('active');
+            document.getElementById('newChatName').value = '';
+            document.getElementById('newChatName').focus();
+        }
+
+        function createConversation() {
+            const name = document.getElementById('newChatName').value.trim();
+            if (!name) return;
+
+            const conv = {
+                id: 'conv_' + Date.now(),
+                name: name,
+                messages: [],
+                createdAt: Date.now()
+            };
+
+            conversations.unshift(conv);
+            saveConversations();
+            closeModal('newChatModal');
+            selectConversation(conv.id);
+        }
+
+        async function deleteConversation(id, event) {
+            event.stopPropagation();
+            const confirmed = await showConfirmDialog('删除对话', '确定删除此对话？删除后无法恢复。');
+            if (!confirmed) return;
+            conversations = conversations.filter(c => c.id !== id);
+            saveConversations();
+
+            if (currentConversationId === id || conversations.length === 0) {
+                currentConversationId = null;
+                document.getElementById('chatTitleInput').value = 'IWBTC Dialog Generator';
+            }
+            showToast('对话已删除', 'success');
+        }
+
+        function renameConversation(id) {
+            const conv = conversations.find(c => c.id === id);
+            if (!conv) return;
+
+            const newName = prompt('请输入新的对话名称：', conv.name);
+            if (newName && newName.trim()) {
+                conv.name = newName.trim();
+                saveConversations();
+                if (currentConversationId === id) {
+                    document.getElementById('chatTitleInput').value = conv.name;
+                }
+                showToast('对话已重命名', 'success');
+            }
+        }
+
+        // 角色管理
+        function showRoleManager() {
+            renderRoleManager();
+            document.getElementById('roleManagerModal').classList.add('active');
+        }
+
+        function renderRoleManager() {
+            // 自己
+            const selfGrid = document.getElementById('selfRolesGrid');
+            selfGrid.innerHTML = '';
+            const selfItem = document.createElement('div');
+            selfItem.className = 'role-item';
+            selfItem.innerHTML = `
+                <img src="${selfConfig.avatar || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'64\' height=\'64\' viewBox=\'0 0 64 64\'%3E%3Ccircle cx=\'32\' cy=\'32\' r=\'32\' fill=\'%23666\'/%3E%3C/svg%3E'}" alt="${selfConfig.name}">
+                <span>${selfConfig.name}</span>
+            `;
+            selfItem.onclick = () => showEditSelfModal();
+            selfGrid.appendChild(selfItem);
+
+            // 旁白
+            const narratorGrid = document.getElementById('narratorRolesGrid');
+            narratorGrid.innerHTML = '';
+            const narratorItem = document.createElement('div');
+            narratorItem.className = 'role-item';
+            narratorItem.innerHTML = `
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23888'/%3E%3Ctext x='50%' y='50%' text-anchor='middle' dy='.3em' fill='%23fff' font-size='28'%3E旁%3C/text%3E%3C/svg%3E" alt="旁白">
+                <span>旁白</span>
+            `;
+            narratorItem.onclick = () => showToast('旁白角色不可编辑', 'info');
+            narratorGrid.appendChild(narratorItem);
+
+            // 预设角色 - 按分类分组
+            const presetCategoriesContainer = document.getElementById('presetRolesCategories');
+            presetCategoriesContainer.innerHTML = '';
+
+            // 获取所有分类
+            const presetCategories = {};
+            presetRoles.forEach(role => {
+                const cat = role.category || '未分类';
+                if (!presetCategories[cat]) presetCategories[cat] = [];
+                presetCategories[cat].push(role);
+            });
+
+            // 渲染每个分类
+            for (const [category, roles] of Object.entries(presetCategories)) {
+                const section = document.createElement('div');
+                section.className = 'role-category';
+                section.innerHTML = `<h4>${category}</h4><div class="role-grid"></div>`;
+                const grid = section.querySelector('.role-grid');
+                roles.forEach(role => {
+                    const item = document.createElement('div');
+                    item.className = 'role-item';
+                    item.innerHTML = `
+                        <img src="${role.avatar}" alt="${role.name}">
+                        <span>${role.name}</span>
+                    `;
+                    item.onclick = () => showToast('预设角色不可编辑', 'info');
+                    grid.appendChild(item);
+                });
+                presetCategoriesContainer.appendChild(section);
+            }
+
+            // 自定义角色 - 按分类分组
+            const customCategoriesContainer = document.getElementById('customRolesCategories');
+            customCategoriesContainer.innerHTML = '';
+
+            const customCategories = {};
+            customRoles.forEach(role => {
+                const cat = role.category || '未分类';
+                if (!customCategories[cat]) customCategories[cat] = [];
+                customCategories[cat].push(role);
+            });
+
+            for (const [category, roles] of Object.entries(customCategories)) {
+                const section = document.createElement('div');
+                section.className = 'role-category';
+                section.innerHTML = `<h4>${category}</h4><div class="role-grid"></div>`;
+                const grid = section.querySelector('.role-grid');
+                roles.forEach(role => {
+                    const item = document.createElement('div');
+                    item.className = 'role-item';
+                    item.innerHTML = `
+                        <img src="${role.avatar}" alt="${role.name}">
+                        <span>${role.name}</span>
+                    `;
+                    item.onclick = () => showEditCustomRoleModal(role.id);
+                    grid.appendChild(item);
+                });
+                customCategoriesContainer.appendChild(section);
+            }
+
+            // 更新自定义下拉框
+            renderSenderDropdown();
+        }
+
+        // 渲染发送者下拉框
+        function renderSenderDropdown() {
+            const menu = document.getElementById('senderDropdownMenu');
+            const defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'28\' height=\'28\' viewBox=\'0 0 48 48\'%3E%3Ccircle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23666\'/%3E%3C/svg%3E';
+            const narratorAvatar = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'28\' height=\'28\' viewBox=\'0 0 48 48\'%3E%3Crect width=\'48\' height=\'48\' fill=\'%23888\'/%3E%3Ctext x=\'50%\' y=\'50%\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%23fff\' font-size=\'20\'%3E旁%3C/text%3E%3C/svg%3E';
+
+            let html = '';
+
+            // 自己
+            html += `<div class="dropdown-group-label">自己</div>`;
+            html += `<div class="dropdown-option" data-value="self" data-name="自己" data-avatar="${selfConfig.avatar || defaultAvatar}">`;
+            html += `<img src="${selfConfig.avatar || defaultAvatar}" alt="">`;
+            html += `<span>自己</span></div>`;
+
+            // 旁白
+            html += `<div class="dropdown-group-label">旁白</div>`;
+            html += `<div class="dropdown-option" data-value="narrator" data-name="旁白" data-avatar="${narratorAvatar}">`;
+            html += `<img src="${narratorAvatar}" alt="">`;
+            html += `<span>旁白</span></div>`;
+
+            // 预设角色 - 按分类分组
+            if (presetRoles.length > 0) {
+                const presetCategories = {};
+                presetRoles.forEach(role => {
+                    const cat = role.category || '未分类';
+                    if (!presetCategories[cat]) presetCategories[cat] = [];
+                    presetCategories[cat].push(role);
+                });
+
+                for (const [category, roles] of Object.entries(presetCategories)) {
+                    html += `<div class="dropdown-group-label">预设 - ${category}</div>`;
+                    roles.forEach(role => {
+                        html += `<div class="dropdown-option" data-value="preset_${role.name}" data-name="${role.name}" data-avatar="${role.avatar}">`;
+                        html += `<img src="${role.avatar}" alt="">`;
+                        html += `<span>${role.name}</span></div>`;
+                    });
+                }
+            }
+
+            // 自定义角色 - 按分类分组
+            if (customRoles.length > 0) {
+                const customCategories = {};
+                customRoles.forEach(role => {
+                    const cat = role.category || '未分类';
+                    if (!customCategories[cat]) customCategories[cat] = [];
+                    customCategories[cat].push(role);
+                });
+
+                for (const [category, roles] of Object.entries(customCategories)) {
+                    html += `<div class="dropdown-group-label">自定义 - ${category}</div>`;
+                    roles.forEach(role => {
+                        html += `<div class="dropdown-option" data-value="custom_${role.id}" data-name="${role.name}" data-avatar="${role.avatar}">`;
+                        html += `<img src="${role.avatar}" alt="">`;
+                        html += `<span>${role.name}</span></div>`;
+                    });
+                }
+            }
+
+            menu.innerHTML = html;
+
+            // 绑定点击事件
+            menu.querySelectorAll('.dropdown-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const value = this.dataset.value;
+                    const name = this.dataset.name;
+                    const avatar = this.dataset.avatar;
+                    selectSenderOption(value, name, avatar);
+                });
+            });
+        }
+
+        // 切换下拉框
+        function toggleSenderDropdown(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('senderDropdown');
+            dropdown.classList.toggle('open');
+        }
+
+        // 选择下拉框选项
+        function selectSenderOption(value, text, avatar) {
+            document.getElementById('senderSelect').value = value;
+            document.getElementById('dropdownSelectedText').textContent = text;
+            document.getElementById('dropdownSelectedAvatar').src = avatar;
+            currentSenderValue = value;
+
+            // 更新选中状态
+            document.querySelectorAll('.dropdown-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.value === value);
+            });
+
+            // 关闭下拉框
+            document.getElementById('senderDropdown').classList.remove('open');
+
+            // 触发原有onchange
+            onSenderChange();
+        }
+
+        // 点击外部关闭下拉框
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('senderDropdown');
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+
+        // 阻止下拉菜单内的点击事件冒泡关闭菜单
+        document.getElementById('senderDropdownMenu').addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        function selectRole(role) {
+            closeModal('roleManagerModal');
+        }
+
+        function toggleCreateRoleForm() {
+            document.getElementById('createRoleForm').classList.toggle('active');
+        }
+
+        function onNewRoleAvatarChange() {
+            const input = document.getElementById('newRoleAvatarInput');
+            const preview = document.getElementById('newRoleAvatarPreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function createCustomRole() {
+            const name = document.getElementById('newRoleName').value.trim();
+            const category = document.getElementById('newRoleCategory').value.trim() || '未分类';
+            const avatarPreview = document.getElementById('newRoleAvatarPreview').src;
+
+            if (!name) return;
+
+            const role = {
+                id: 'custom_' + Date.now(),
+                name: name,
+                avatar: avatarPreview,
+                type: 'custom',
+                category: category
+            };
+
+            customRoles.push(role);
+            localStorage.setItem('customRoles', JSON.stringify(customRoles));
+            renderRoleManager();
+
+            document.getElementById('newRoleName').value = '';
+            document.getElementById('newRoleCategory').value = '';
+            document.getElementById('createRoleForm').classList.remove('active');
+        }
+
+        function deleteCustomRole(id) {
+            showConfirmDialog('删除角色', '确定删除此角色吗？').then((confirmed) => {
+                if (confirmed) {
+                    customRoles = customRoles.filter(r => r.id !== id);
+                    localStorage.setItem('customRoles', JSON.stringify(customRoles));
+                    renderRoleManager();
+                    renderSenderDropdown();
+                }
+            });
+        }
+
+        // 发送者配置
+        function onSenderChange() {
+            const select = document.getElementById('senderSelect');
+            const selfConfig = document.getElementById('selfConfig');
+            const value = select.value;
+
+            if (value === 'self') {
+                selfConfig.style.display = 'flex';
+            } else {
+                selfConfig.style.display = 'none';
+            }
+        }
+
+        function onSelfAvatarChange() {
+            const input = document.getElementById('selfAvatarInput');
+            const preview = document.getElementById('selfAvatarPreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    selfConfig.avatar = e.target.result;
+                    localStorage.setItem('selfConfig', JSON.stringify(selfConfig));
+                    // 更新下拉框头像
+                    const dropdownAvatar = document.getElementById('dropdownSelectedAvatar');
+                    if (dropdownAvatar) dropdownAvatar.src = e.target.result;
+                    renderSenderDropdown();
+                    renderRoleManager();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function updateSelfConfig() {
+            document.getElementById('selfAvatarPreview').src = selfConfig.avatar || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 32 32\'%3E%3Ccircle cx=\'16\' cy=\'16\' r=\'16\' fill=\'%23666\'/%3E%3C/svg%3E';
+            document.getElementById('selfName').value = selfConfig.name || '我';
+        }
+
+        // 显示编辑自己模态框
+        function showEditSelfModal() {
+            document.getElementById('editSelfName').value = selfConfig.name || '我';
+            document.getElementById('editSelfAvatarPreview').src = selfConfig.avatar || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'64\' height=\'64\' viewBox=\'0 0 64 64\'%3E%3Ccircle cx=\'32\' cy=\'32\' r=\'32\' fill=\'%23666\'/%3E%3C/svg%3E';
+            document.getElementById('editSelfModal').classList.add('active');
+        }
+
+        // 编辑自己头像
+        let editSelfAvatarData = null;
+        function onEditSelfAvatarChange() {
+            const input = document.getElementById('editSelfAvatarInput');
+            const preview = document.getElementById('editSelfAvatarPreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    editSelfAvatarData = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // 保存自己编辑
+        function saveSelfEdit() {
+            const name = document.getElementById('editSelfName').value.trim() || '我';
+            selfConfig.name = name;
+            if (editSelfAvatarData) {
+                selfConfig.avatar = editSelfAvatarData;
+            }
+            localStorage.setItem('selfConfig', JSON.stringify(selfConfig));
+            updateSelfConfig();
+            renderSenderDropdown();
+            renderRoleManager();
+            closeModal('editSelfModal');
+            showToast('保存成功', 'success');
+            editSelfAvatarData = null;
+        }
+
+        // 编辑自定义角色相关变量
+        let editingCustomRoleId = null;
+        let editCustomRoleAvatarData = null;
+
+        // 显示编辑自定义角色模态框
+        function showEditCustomRoleModal(roleId) {
+            const role = customRoles.find(r => r.id === roleId);
+            if (!role) return;
+
+            editingCustomRoleId = roleId;
+            editCustomRoleAvatarData = null;
+
+            document.getElementById('editCustomRoleName').value = role.name;
+            document.getElementById('editCustomRoleCategory').value = role.category || '';
+            document.getElementById('editCustomRoleAvatarPreview').src = role.avatar;
+
+            document.getElementById('editCustomRoleModal').classList.add('active');
+        }
+
+        // 编辑自定义角色头像
+        function onEditCustomRoleAvatarChange() {
+            const input = document.getElementById('editCustomRoleAvatarInput');
+            const preview = document.getElementById('editCustomRoleAvatarPreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    editCustomRoleAvatarData = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // 保存自定义角色编辑
+        function saveCustomRoleEdit() {
+            const name = document.getElementById('editCustomRoleName').value.trim();
+            const category = document.getElementById('editCustomRoleCategory').value.trim() || '未分类';
+
+            if (!name || !editingCustomRoleId) return;
+
+            const roleIndex = customRoles.findIndex(r => r.id === editingCustomRoleId);
+            if (roleIndex === -1) return;
+
+            customRoles[roleIndex].name = name;
+            customRoles[roleIndex].category = category;
+            if (editCustomRoleAvatarData) {
+                customRoles[roleIndex].avatar = editCustomRoleAvatarData;
+            }
+
+            localStorage.setItem('customRoles', JSON.stringify(customRoles));
+            renderRoleManager();
+            closeModal('editCustomRoleModal');
+            showToast('保存成功', 'success');
+
+            editingCustomRoleId = null;
+            editCustomRoleAvatarData = null;
+        }
+
+        // 确认删除自定义角色
+        function confirmDeleteCustomRole() {
+            if (!editingCustomRoleId) return;
+
+            showConfirmDialog('确认删除', '确定要删除此角色吗？').then((confirmed) => {
+                if (confirmed) {
+                    customRoles = customRoles.filter(r => r.id !== editingCustomRoleId);
+                    localStorage.setItem('customRoles', JSON.stringify(customRoles));
+                    renderRoleManager();
+                    closeModal('editCustomRoleModal');
+                    showToast('删除成功', 'success');
+                    editingCustomRoleId = null;
+                }
+            });
+        }
+
+        document.getElementById('selfName').addEventListener('change', (e) => {
+            selfConfig.name = e.target.value || '我';
+            localStorage.setItem('selfConfig', JSON.stringify(selfConfig));
+            renderSenderDropdown();
+            renderRoleManager();
+        });
+
+        // 文件选择
+        function onFileSelect() {
+            const input = document.getElementById('fileInput');
+            selectedFiles = Array.from(input.files);
+            renderFilePreview();
+        }
+
+        // 缓存文件预览数据，避免重复读取
+        const filePreviewCache = new Map();
+
+        function renderFilePreview() {
+            const preview = document.getElementById('filePreview');
+            preview.innerHTML = '';
+
+            selectedFiles.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'file-preview-item';
+
+                if (file.type.startsWith('image/')) {
+                    let dataUrl = filePreviewCache.get(file);
+                    if (!dataUrl) {
+                        dataUrl = URL.createObjectURL(file);
+                        filePreviewCache.set(file, dataUrl);
+                    }
+                    item.innerHTML = `
+                        <img src="${dataUrl}" alt="${file.name}" style="cursor: pointer;">
+                        <span class="remove-file" onclick="event.stopPropagation(); confirmRemoveFile(${index})">✕</span>
+                    `;
+                    item.querySelector('img').onclick = () => showImagePreview(dataUrl);
+                } else {
+                    item.innerHTML = `
+                        <div class="file-icon">📄 ${file.name}</div>
+                        <span class="remove-file" onclick="confirmRemoveFile(${index})">✕</span>
+                    `;
+                }
+
+                preview.appendChild(item);
+            });
+        }
+
+        async function confirmRemoveFile(index) {
+            const confirmed = await showConfirmDialog('删除文件', '确定要删除此文件吗？');
+            if (confirmed) {
+                const file = selectedFiles[index];
+                if (filePreviewCache.has(file)) {
+                    URL.revokeObjectURL(filePreviewCache.get(file));
+                    filePreviewCache.delete(file);
+                }
+                selectedFiles.splice(index, 1);
+                renderFilePreview();
+            }
+        }
+
+        // 发送消息
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage().catch(console.error);
+            }
+        }
+
+        async function sendMessage() {
+            const content = document.getElementById('messageInput').value.trim();
+
+            if (!content && selectedFiles.length === 0) {
+                showToast('请输入消息内容', 'info');
+                return;
+            }
+
+            if (!currentConversationId) {
+                const conv = {
+                    id: 'conv_' + Date.now(),
+                    name: '新对话',
+                    messages: [],
+                    createdAt: Date.now()
+                };
+                conversations.unshift(conv);
+                currentConversationId = conv.id;
+                document.getElementById('chatTitleInput').value = conv.name;
+            }
+
+            let sender;
+
+            if (currentSenderValue === 'self') {
+                sender = {
+                    type: 'self',
+                    name: selfConfig.name || '我',
+                    avatar: selfConfig.avatar
+                };
+            } else if (currentSenderValue === 'narrator') {
+                sender = {
+                    type: 'narrator',
+                    name: '旁白',
+                    avatar: ''
+                };
+            } else if (currentSenderValue.startsWith('preset_')) {
+                const roleName = currentSenderValue.replace('preset_', '');
+                const role = presetRoles.find(r => r.name === roleName);
+                if (role) {
+                    sender = {
+                        type: 'preset',
+                        name: role.name,
+                        avatar: role.avatar
+                    };
+                }
+            } else if (currentSenderValue.startsWith('custom_')) {
+                const roleId = currentSenderValue.replace('custom_', '');
+                const role = customRoles.find(r => r.id === roleId);
+                if (role) {
+                    sender = {
+                        type: 'custom',
+                        name: role.name,
+                        avatar: role.avatar
+                    };
+                }
+            }
+
+            if (!sender) return;
+
+            let fileDataArray = [];
+            try {
+                if (selectedFiles.length > 0) {
+                    const isLargeFile = selectedFiles.some(f => f.size > 5 * 1024 * 1024);
+
+                    if (isLargeFile) {
+                        showToast(`正在处理 ${selectedFiles.length} 个文件，请稍候...`, 'info');
+                    }
+
+                    fileDataArray = await new Promise((resolve, reject) => {
+                        const results = [];
+                        let completed = 0;
+                        let errors = 0;
+
+                        const processFile = (index) => {
+                            if (index >= selectedFiles.length) {
+                                if (errors > 0 && completed === 0) {
+                                    reject(new Error('文件处理失败'));
+                                } else {
+                                    resolve(results);
+                                }
+                                return;
+                            }
+
+                            const file = selectedFiles[index];
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                results.push({
+                                    name: file.name,
+                                    type: file.type,
+                                    data: e.target.result
+                                });
+                                completed++;
+
+                                if (completed % 5 === 0 || completed === selectedFiles.length) {
+                                    requestAnimationFrame(() => processFile(index + 1));
+                                } else {
+                                    processFile(index + 1);
+                                }
+                            };
+                            reader.onerror = () => {
+                                errors++;
+                                processFile(index + 1);
+                            };
+                            reader.readAsDataURL(file);
+                        };
+
+                        processFile(0);
+                    });
+
+                    if (isLargeFile && fileDataArray.length > 0) {
+                        showToast('文件处理完成，正在发送...', 'info');
+                    }
+                }
+            } catch (err) {
+                console.error('文件处理错误:', err);
+                showToast('文件处理失败', 'error');
+                return;
+            }
+
+            const message = {
+                id: 'msg_' + Date.now(),
+                type: content && fileDataArray.length > 0 ? 'mixed' : (fileDataArray.length > 0 ? 'file' : 'text'),
+                sender: sender,
+                content: content,
+                files: fileDataArray,
+                timestamp: Date.now()
+            };
+
+            const conv = conversations.find(c => c.id === currentConversationId);
+            if (conv) {
+                if (!conv.messages) conv.messages = [];
+                conv.messages.push(message);
+                deletedMessages.push({ convId: conv.id, message: message, isSent: true });
+                saveConversations();
+                renderMessages();
+            }
+
+            document.getElementById('messageInput').value = '';
+            document.getElementById('messageInput').style.height = 'auto';
+            document.getElementById('messageInput').rows = 1;
+            filePreviewCache.forEach(url => URL.revokeObjectURL(url));
+            filePreviewCache.clear();
+            selectedFiles = [];
+            document.getElementById('filePreview').innerHTML = '';
+        }
+
+        // 导出图片
+        let exportAspectRatio = isMobileDevice() ? '9:16' : '16:9';
+        let pendingCanvas = null;
+
+        async function imageToDataURL(src, defaultAvatar = '') {
+            if (!src) return defaultAvatar;
+            if (src.startsWith('data:')) return src;
+            if (!defaultAvatar) {
+                defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 48 48\'%3E%3Ccircle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23666\'/%3E%3C/svg%3E';
+            }
+            let imageSrc = src;
+            if (!imageSrc.startsWith('http') && !imageSrc.startsWith('file') && !imageSrc.startsWith('data:')) {
+                imageSrc = new URL(imageSrc, window.location.href).href;
+            }
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.naturalWidth;
+                        canvas.height = img.naturalHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        resolve(canvas.toDataURL('image/png'));
+                    } catch (e) {
+                        console.warn('Canvas draw failed for:', src);
+                        resolve(defaultAvatar);
+                    }
+                };
+                img.onerror = () => {
+                    console.warn('Image load failed for:', src);
+                    resolve(defaultAvatar);
+                };
+                img.src = imageSrc;
+            });
+        }
+
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+        }
+
+        function setExportAspectRatio(ratio) {
+            exportAspectRatio = ratio;
+            document.querySelectorAll('.chat-header-actions .aspect-ratio-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.ratio === ratio);
+            });
+        }
+
+        function setExportPreviewRatio(ratio) {
+            exportAspectRatio = ratio;
+            document.querySelectorAll('.export-preview-header .aspect-ratio-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.ratio === ratio);
+            });
+            generateExportPreview();
+        }
+
+        function showImagePreview(src) {
+            document.getElementById('imagePreviewContent').src = src;
+            document.getElementById('imagePreviewModal').classList.add('active');
+        }
+
+        function closeImagePreview() {
+            document.getElementById('imagePreviewModal').classList.remove('active');
+        }
+
+        function closeExportPreview() {
+            document.getElementById('exportPreviewModal').classList.remove('active');
+            pendingCanvas = null;
+        }
+
+        async function generateExportPreview() {
+            if (!currentConversationId) return;
+
+            const conv = conversations.find(c => c.id === currentConversationId);
+            if (!conv || !conv.messages || conv.messages.length === 0) return;
+
+            const is9_16 = exportAspectRatio === '9:16';
+            const baseWidth = is9_16 ? 450 : 800;
+            const baseHeight = is9_16 ? 800 : 450;
+
+            const exportDiv = document.createElement('div');
+            exportDiv.style.cssText = `
+                width: ${baseWidth}px;
+                min-height: ${baseHeight}px;
+                background-color: #04151E;
+                padding: 20px;
+                font-family: 'Liberation Sans', 'Source Han Sans SC', sans-serif;
+                box-sizing: border-box;
+            `;
+
+            const title = document.createElement('h2');
+            title.style.cssText = `
+                color: #fff;
+                margin-bottom: 20px;
+                font-size: 18px;
+                font-weight: bold;
+                text-align: left;
+            `;
+            title.textContent = conv.name;
+            exportDiv.appendChild(title);
+
+            const messagesContainer = document.createElement('div');
+            messagesContainer.style.cssText = 'display: flex; flex-direction: column;';
+
+            for (const msg of conv.messages) {
+                const wrapper = document.createElement('div');
+                wrapper.style.cssText = `
+                    display: flex;
+                    margin-bottom: 16px;
+                    align-items: flex-start;
+                `;
+
+                if (msg.sender.type === 'narrator') {
+                    wrapper.style.justifyContent = 'center';
+                    const content = document.createElement('span');
+                    content.style.cssText = 'font-style: italic; color: #888; font-size: 14px; text-align: center; max-width: 80%;';
+                    content.textContent = msg.content;
+                    wrapper.appendChild(content);
+                } else if (msg.sender.type === 'self') {
+                    wrapper.style.justifyContent = 'flex-end';
+                    let selfAvatar = selfConfig.avatar;
+                    if (selfAvatar && !selfAvatar.startsWith('data:')) {
+                        selfAvatar = await imageToDataURL(selfAvatar) || selfAvatar;
+                    }
+                    const avatar = selfAvatar || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 48 48\'%3E%3Ccircle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23666\'/%3E%3C/svg%3E';
+
+                    const avatarImg = document.createElement('img');
+                    avatarImg.src = avatar;
+                    avatarImg.style.cssText = 'width: 48px; height: 48px; border-radius: 50%; margin-right: 12px; object-fit: cover; align-self: flex-start; flex-shrink: 0;';
+
+                    const contentWrapper = document.createElement('div');
+                    contentWrapper.style.cssText = 'display: flex; flex-direction: column; align-items: flex-end; max-width: 60%;';
+
+                    if (msg.sender.name !== '我') {
+                        const nameEl = document.createElement('div');
+                        nameEl.style.cssText = 'font-size: 12px; color: #aaa; margin-bottom: 4px;';
+                        nameEl.textContent = msg.sender.name;
+                        contentWrapper.appendChild(nameEl);
+                    }
+
+                    const bubble = document.createElement('div');
+                    bubble.style.cssText = 'background-color: #007ACC; padding: 10px 14px; border-radius: 12px; border-bottom-right-radius: 4px;';
+                    bubble.innerHTML = `<div style="color: #fff; line-height: 1.5; word-break: break-word; white-space: pre-wrap;">${msg.content || ''}</div>${await renderFilesForExportAsync(msg.files)}`;
+                    contentWrapper.appendChild(bubble);
+
+                    const time = document.createElement('div');
+                    time.style.cssText = 'font-size: 10px; color: #888; margin-top: 4px;';
+                    time.textContent = formatTime(msg.timestamp);
+                    contentWrapper.appendChild(time);
+
+                    wrapper.appendChild(contentWrapper);
+                    wrapper.appendChild(avatarImg);
+                } else {
+                    const defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 48 48\'%3E%3Ccircle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23666\'/%3E%3C/svg%3E';
+                    let avatarSrc = msg.sender.avatar;
+                    if (!avatarSrc) {
+                        if (msg.sender.type === 'preset') {
+                            const role = presetRoles.find(r => r.name === msg.sender.name);
+                            if (role && role.avatar) {
+                                avatarSrc = role.avatar;
+                            } else {
+                                const folders = {
+                                    'IC玩家': ['AikesiX.png'],
+                                    '游戏角色': [
+                                        'Kid.png', '兔兔.png', '冰雪散人.png', '剑客散人.png', '圣诞散人.png',
+                                        '夏日水果.png', '小刺.png', '小机器人.png', '小狼(旧).png', '小狼.png',
+                                        '小草.png', '小鞭炮.png', '幽灵Kid.png', '探险者散人.png', '散人.png',
+                                        '散娘.png', '水果猫.png', '特若.png', '猫耳散人.png', '福散.png',
+                                        '窗花散人.png', '纯色Kid.png', '纯色散人.png', '线条Kid.png', '线条散人.png',
+                                        '蜗牛小G.png', '雪花散人.png'
+                                    ]
+                                };
+                                for (const [folder, files] of Object.entries(folders)) {
+                                    for (const file of files) {
+                                        const fileName = file.replace(/\.[^/.]+$/, '');
+                                        if (fileName === msg.sender.name) {
+                                            avatarSrc = await imageToDataURL('Character/' + folder + '/' + file) || avatarSrc;
+                                            break;
+                                        }
+                                    }
+                                    if (avatarSrc && avatarSrc.startsWith('data:')) break;
+                                }
+                            }
+                        } else if (msg.sender.type === 'custom') {
+                            const role = customRoles.find(r => r.id === msg.sender.id);
+                            if (role && role.avatar) avatarSrc = role.avatar;
+                        }
+                    }
+                    if (!avatarSrc) avatarSrc = defaultAvatar;
+                    if (avatarSrc && !avatarSrc.startsWith('data:') && !avatarSrc.startsWith('http')) {
+                        const converted = await imageToDataURL(avatarSrc);
+                        avatarSrc = (converted && converted.startsWith('data:')) ? converted : defaultAvatar;
+                    }
+                    const avatarImg = document.createElement('img');
+                    avatarImg.src = avatarSrc;
+                    avatarImg.style.cssText = 'width: 48px; height: 48px; border-radius: 50%; margin-left: 12px; object-fit: cover; align-self: flex-start; flex-shrink: 0;';
+
+                    const contentWrapper = document.createElement('div');
+                    contentWrapper.style.cssText = 'display: flex; flex-direction: column; align-items: flex-start; max-width: 60%;';
+
+                    const nameEl = document.createElement('div');
+                    nameEl.style.cssText = 'font-size: 12px; color: #aaa; margin-bottom: 4px;';
+                    nameEl.textContent = msg.sender.name;
+                    contentWrapper.appendChild(nameEl);
+
+                    const bubbleColor = msg.sender.type === 'preset' || msg.sender.type === 'custom' ? '#2D5A7B' : '#1E3A4D';
+                    const bubble = document.createElement('div');
+                    bubble.style.cssText = `background-color: ${bubbleColor}; padding: 10px 14px; border-radius: 12px; border-bottom-left-radius: 4px;`;
+                    bubble.innerHTML = `<div style="color: #fff; line-height: 1.5; word-break: break-word; white-space: pre-wrap;">${msg.content || ''}</div>${await renderFilesForExportAsync(msg.files)}`;
+                    contentWrapper.appendChild(bubble);
+
+                    const time = document.createElement('div');
+                    time.style.cssText = 'font-size: 10px; color: #888; margin-top: 4px;';
+                    time.textContent = formatTime(msg.timestamp);
+                    contentWrapper.appendChild(time);
+
+                    wrapper.appendChild(avatarImg);
+                    wrapper.appendChild(contentWrapper);
+                }
+
+                messagesContainer.appendChild(wrapper);
+            }
+
+            exportDiv.appendChild(messagesContainer);
+
+            const footer = document.createElement('div');
+            footer.style.cssText = 'text-align: center; font-size: 12px; color: #fff; padding-top: 8px; border-top: 1px solid #1a2a3a;';
+            const now = new Date();
+            footer.innerHTML = `
+                <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator</div>
+                <div>导出时间：${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}</div>
+            `;
+            exportDiv.appendChild(footer);
+
+            document.body.appendChild(exportDiv);
+
+            try {
+                const canvas = await html2canvas(exportDiv, {
+                    backgroundColor: '#04151E',
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    imageTimeout: 15000
+                });
+
+                pendingCanvas = canvas;
+                document.getElementById('exportPreviewContent').innerHTML = '';
+                const img = document.createElement('img');
+                img.src = canvas.toDataURL('image/png');
+                document.getElementById('exportPreviewContent').appendChild(img);
+            } catch (err) {
+                console.error(err);
+                showToast('生成预览失败', 'error');
+            } finally {
+                document.body.removeChild(exportDiv);
+            }
+        }
+
+        function confirmExportImage() {
+            if (pendingCanvas && currentConversationId) {
+                const conv = conversations.find(c => c.id === currentConversationId);
+                const link = document.createElement('a');
+                link.download = `${conv.name}_聊天记录.png`;
+                link.href = pendingCanvas.toDataURL('image/png');
+                link.click();
+                showToast('导出成功', 'success');
+                closeExportPreview();
+            } else {
+                showToast('图片正在生成中，请稍候', 'info');
+            }
+        }
+
+        async function showExportPreview() {
+            if (!currentConversationId) {
+                showToast('请先选择一个对话', 'error');
+                return;
+            }
+
+            const conv = conversations.find(c => c.id === currentConversationId);
+            if (!conv || !conv.messages || conv.messages.length === 0) {
+                showToast('没有可导出的聊天记录', 'error');
+                return;
+            }
+
+            document.querySelectorAll('.export-preview-header .aspect-ratio-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.ratio === exportAspectRatio);
+            });
+
+            document.getElementById('exportPreviewModal').classList.add('active');
+            pendingCanvas = null;
+            await generateExportPreview();
+        }
+
+        async function exportChatAsImage() {
+            if (!currentConversationId) {
+                showToast('请先选择一个对话', 'error');
+                return;
+            }
+
+            const conv = conversations.find(c => c.id === currentConversationId);
+
+            if (!conv || !conv.messages || conv.messages.length === 0) {
+                showToast('没有可导出的聊天记录', 'error');
+                return;
+            }
+
+            const is9_16 = exportAspectRatio === '9:16';
+            const baseWidth = is9_16 ? 450 : 800;
+            const baseHeight = is9_16 ? 800 : 450;
+
+            const exportDiv = document.createElement('div');
+            exportDiv.style.cssText = `
+                position: fixed;
+                left: -9999px;
+                top: 0;
+                width: ${baseWidth}px;
+                min-height: ${baseHeight}px;
+                background-color: #04151E;
+                padding: 30px;
+                font-family: 'Liberation Sans', 'Source Han Sans SC', sans-serif;
+                box-sizing: border-box;
+            `;
+
+            const title = document.createElement('h2');
+            title.style.cssText = `
+                color: #fff;
+                margin-bottom: 20px;
+                font-size: 20px;
+                font-weight: bold;
+                text-align: center;
+            `;
+            title.textContent = conv.name;
+            exportDiv.appendChild(title);
+
+            const messagesContainer = document.createElement('div');
+            messagesContainer.style.cssText = 'display: flex; flex-direction: column;';
+
+            for (const msg of conv.messages) {
+                const wrapper = document.createElement('div');
+                wrapper.style.cssText = `
+                    display: flex;
+                    margin-bottom: 16px;
+                    align-items: flex-start;
+                `;
+
+                if (msg.sender.type === 'narrator') {
+                    wrapper.style.justifyContent = 'center';
+                    const content = document.createElement('span');
+                    content.style.cssText = 'font-style: italic; color: #888888; font-size: 14px; text-align: center; max-width: 80%;';
+                    content.textContent = msg.content;
+                    wrapper.appendChild(content);
+                } else if (msg.sender.type === 'self') {
+                    wrapper.style.justifyContent = 'flex-end';
+                    let selfAvatar = selfConfig.avatar;
+                    if (selfAvatar && !selfAvatar.startsWith('data:')) {
+                        selfAvatar = await imageToDataURL(selfAvatar) || selfAvatar;
+                    }
+                    const avatar = selfAvatar || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 48 48\'%3E%3Ccircle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23666\'/%3E%3C/svg%3E';
+
+                    const avatarImg = document.createElement('img');
+                    avatarImg.src = avatar;
+                    avatarImg.style.cssText = 'width: 48px; height: 48px; border-radius: 50%; margin-right: 12px; object-fit: cover; align-self: flex-start; flex-shrink: 0;';
+
+                    const contentWrapper = document.createElement('div');
+                    contentWrapper.style.cssText = 'display: flex; flex-direction: column; align-items: flex-end; max-width: 60%;';
+
+                    if (msg.sender.name !== '我') {
+                        const nameEl = document.createElement('div');
+                        nameEl.style.cssText = 'font-size: 12px; color: #aaa; margin-bottom: 4px;';
+                        nameEl.textContent = msg.sender.name;
+                        contentWrapper.appendChild(nameEl);
+                    }
+
+                    const bubble = document.createElement('div');
+                    bubble.style.cssText = 'background-color: #007ACC; padding: 10px 14px; border-radius: 12px; border-bottom-right-radius: 4px;';
+                    bubble.innerHTML = `<div style="color: #fff; line-height: 1.5; word-break: break-word; white-space: pre-wrap;">${msg.content || ''}</div>${await renderFilesForExportAsync(msg.files)}`;
+                    contentWrapper.appendChild(bubble);
+
+                    const time = document.createElement('div');
+                    time.style.cssText = 'font-size: 10px; color: #888; margin-top: 4px;';
+                    time.textContent = formatTime(msg.timestamp);
+                    contentWrapper.appendChild(time);
+
+                    wrapper.appendChild(contentWrapper);
+                    wrapper.appendChild(avatarImg);
+                } else {
+                    const defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 48 48\'%3E%3Ccircle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23666\'/%3E%3C/svg%3E';
+                    let avatarSrc = msg.sender.avatar;
+                    if (!avatarSrc) {
+                        if (msg.sender.type === 'preset') {
+                            const role = presetRoles.find(r => r.name === msg.sender.name);
+                            if (role && role.avatar) {
+                                avatarSrc = role.avatar;
+                            } else {
+                                const folders = {
+                                    'IC玩家': ['AikesiX.png'],
+                                    '游戏角色': [
+                                        'Kid.png', '兔兔.png', '冰雪散人.png', '剑客散人.png', '圣诞散人.png',
+                                        '夏日水果.png', '小刺.png', '小机器人.png', '小狼(旧).png', '小狼.png',
+                                        '小草.png', '小鞭炮.png', '幽灵Kid.png', '探险者散人.png', '散人.png',
+                                        '散娘.png', '水果猫.png', '特若.png', '猫耳散人.png', '福散.png',
+                                        '窗花散人.png', '纯色Kid.png', '纯色散人.png', '线条Kid.png', '线条散人.png',
+                                        '蜗牛小G.png', '雪花散人.png'
+                                    ]
+                                };
+                                for (const [folder, files] of Object.entries(folders)) {
+                                    for (const file of files) {
+                                        const fileName = file.replace(/\.[^/.]+$/, '');
+                                        if (fileName === msg.sender.name) {
+                                            avatarSrc = await imageToDataURL('Character/' + folder + '/' + file) || avatarSrc;
+                                            break;
+                                        }
+                                    }
+                                    if (avatarSrc && avatarSrc.startsWith('data:')) break;
+                                }
+                            }
+                        } else if (msg.sender.type === 'custom') {
+                            const role = customRoles.find(r => r.id === msg.sender.id);
+                            if (role && role.avatar) avatarSrc = role.avatar;
+                        }
+                    }
+                    if (!avatarSrc) avatarSrc = defaultAvatar;
+                    if (avatarSrc && !avatarSrc.startsWith('data:') && !avatarSrc.startsWith('http')) {
+                        const converted = await imageToDataURL(avatarSrc);
+                        avatarSrc = (converted && converted.startsWith('data:')) ? converted : defaultAvatar;
+                    }
+                    const avatarImg = document.createElement('img');
+                    avatarImg.src = avatarSrc;
+                    avatarImg.style.cssText = 'width: 48px; height: 48px; border-radius: 50%; margin-left: 12px; object-fit: cover; align-self: flex-start; flex-shrink: 0;';
+
+                    const contentWrapper = document.createElement('div');
+                    contentWrapper.style.cssText = 'display: flex; flex-direction: column; align-items: flex-start; max-width: 60%;';
+
+                    const nameEl = document.createElement('div');
+                    nameEl.style.cssText = 'font-size: 12px; color: #aaa; margin-bottom: 4px;';
+                    nameEl.textContent = msg.sender.name;
+                    contentWrapper.appendChild(nameEl);
+
+                    const bubbleColor = msg.sender.type === 'preset' || msg.sender.type === 'custom' ? '#2D5A7B' : '#1E3A4D';
+                    const bubble = document.createElement('div');
+                    bubble.style.cssText = `background-color: ${bubbleColor}; padding: 10px 14px; border-radius: 12px; border-bottom-left-radius: 4px;`;
+                    bubble.innerHTML = `<div style="color: #fff; line-height: 1.5; word-break: break-word; white-space: pre-wrap;">${msg.content || ''}</div>${await renderFilesForExportAsync(msg.files)}`;
+                    contentWrapper.appendChild(bubble);
+
+                    const time = document.createElement('div');
+                    time.style.cssText = 'font-size: 10px; color: #888; margin-top: 4px;';
+                    time.textContent = formatTime(msg.timestamp);
+                    contentWrapper.appendChild(time);
+
+                    wrapper.appendChild(avatarImg);
+                    wrapper.appendChild(contentWrapper);
+                }
+
+                messagesContainer.appendChild(wrapper);
+            }
+
+            exportDiv.appendChild(messagesContainer);
+
+            document.body.appendChild(exportDiv);
+
+            try {
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                const canvas = await html2canvas(exportDiv, {
+                    backgroundColor: '#04151E',
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    imageTimeout: 15000
+                });
+
+                const link = document.createElement('a');
+                link.download = `${conv.name}_聊天记录.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast('导出成功', 'success');
+            } catch (err) {
+                showToast('导出失败，请重试', 'error');
+                console.error(err);
+            } finally {
+                document.body.removeChild(exportDiv);
+            }
+        }
+
+        async function renderFilesForExportAsync(files) {
+            if (!files || files.length === 0) return '';
+            let html = '';
+            for (const file of files) {
+                if (file.type.startsWith('image/')) {
+                    html += `<div style="margin-top: 8px;"><img src="${file.data}" style="max-width: 200px; max-height: 200px; border-radius: 4px;" crossorigin="anonymous"></div>`;
+                } else {
+                    html += `<div style="margin-top: 8px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 8px;"><span>📄</span> ${file.name}</div>`;
+                }
+            }
+            return html;
+        }
+
+        // 模态框
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function showAboutModal() {
+            document.getElementById('aboutModal').classList.add('active');
+        }
+
+        // 点击模态框外部关闭
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
