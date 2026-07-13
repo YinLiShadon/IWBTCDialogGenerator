@@ -35,5 +35,7 @@
 
 2. Yuzutalk/Momotalk (蔚蓝档案对话编辑器)：https://www.yuzutalk.net/
 
-3. MayerTalk (明日方舟对话编辑器)：https://www.mayertalk.top/
+3. Closure Talk (明日方舟与蔚蓝档案对话编辑器)：https://closuretalk.github.io/
+  
+4. MayerTalk (明日方舟对话编辑器)：https://www.mayertalk.top/
 
