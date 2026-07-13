@@ -13,6 +13,8 @@
 
 版本 2026.07.13b
 
+移动端还有些问题，敬请谅解！
+
 ## 示例
 横屏：<img width="1600" height="1318" alt="示例 - 横屏" src="https://github.com/user-attachments/assets/880ac625-595c-4855-9877-dffbe2aaf761" />
 竖屏：<img width="900" height="1600" alt="示例 - 竖屏" src="https://github.com/user-attachments/assets/00af38ea-6636-4032-9ea9-3add83101799" />
