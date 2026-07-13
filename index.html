@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IWBTC Dialog Generator</title>
+    <title>IWBTC Dialog Generator - 《我想成为创造者》(I wanna be the Creator) 对话编辑器</title>
     <link href="https://fonts.googleapis.com/css2?family=Source+Han+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         @font-face {
@@ -1072,7 +1072,7 @@
                     <button class="btn-select-messages" onclick="toggleMessageSelectionMode()" style="padding: 8px 16px; background: transparent; color: var(--text-color); border: 1px solid var(--btn-color); border-radius: 4px; cursor: pointer;">☑️ 选择</button>
                     <button class="btn-undo" onclick="undoDelete()" title="撤销">↩️ 撤销</button>
                     <button class="btn-redo" onclick="redoDelete()" title="重做">↪️ 重做</button>
-                    <button class="btn-clear" onclick="clearCurrentConversation()">清屏</button>
+                    <button class="btn-clear" onclick="resetCurrentConversation()">重置</button>
                     <button class="btn-export" onclick="showExportPreview()">导出图片</button>
                     <button class="btn-role-manager" onclick="showRoleManager()">角色管理</button>
                     <button class="btn-about" onclick="showAboutModal()">关于</button>
@@ -1222,18 +1222,26 @@
 
     <!-- 关于模态框 -->
     <div class="modal" id="aboutModal">
-        <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">
                 <span class="modal-title">关于</span>
                 <button class="modal-close" onclick="closeModal('aboutModal')">&times;</button>
             </div>
             <div style="text-align: center; padding: 20px;">
-                <div style="font-size: 48px; margin-bottom: 16px;">💬</div>
                 <h2 style="margin: 0 0 8px 0;">IWBTC Dialog Generator</h2>
-                <p style="color: #888; margin: 0 0 16px 0;">版本 1.0.0</p>
-                <p style="line-height: 1.6;">一个简洁的聊天应用，支持多角色对话、自定义角色、消息导出等功能。</p>
-                <p style="margin-top: 16px;"><a href="https://github.com/iwbtc/dialog-generator" target="_blank" style="display: inline-block; padding: 10px 20px; background: var(--btn-color); color: white; text-decoration: none; border-radius: 6px;">GitHub 仓库</a></p>
-                <p style="color: #888; font-size: 12px; margin-top: 20px;">© 2024 IWBTC</p>
+                <p style="color: #888; margin: 0 0 16px 0;">版本 2026.07.13a</p>
+                <p style="line-height: 1.6;">《我想成为创造者》(I wanna be the Creator) 对话编辑器</p>
+                <p style="line-height: 1.6; margin-top: 8px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M2.7 模型</p>
+                <p style="line-height: 1.6; margin-top: 16px; text-align: left;">免责声明：</p>
+                <p style="line-height: 1.6; text-align: left; color: #aaa;">1. 仅供娱乐，请勿过度解读</p>
+                <p style="line-height: 1.6; text-align: left; color: #aaa;">2. 角色图片来源于游戏解包和网络，本人不具有上述图片版权</p>
+                <p style="line-height: 1.6; text-align: left; color: #aaa;">3. 此工具与AikesiX和游戏《我想成为创造者》(I wanna be the Creator) 无直接关联</p>
+                <p style="line-height: 1.6; margin-top: 16px; text-align: left;">灵感来源：</p>
+                <p style="line-height: 1.6; text-align: left; color: #aaa;">1. 仿照微信、QQ聊天界面的工具</p>
+                <p style="line-height: 1.6; text-align: left; color: #aaa;">2. Yuzutalk/Momotalk (蔚蓝档案对话编辑器)：<a href="https://www.yuzutalk.net/" target="_blank" style="color: var(--btn-color);">https://www.yuzutalk.net/</a></p>
+                <p style="line-height: 1.6; text-align: left; color: #aaa;">3. MayerTalk (明日方舟对话编辑器)：<a href="https://www.mayertalk.top/" target="_blank" style="color: var(--btn-color);">https://www.mayertalk.top/</a></p>
+                <p style="margin-top: 16px;"><a href="https://github.com/YinLiShadon/IWBTCDialogGenerator" target="_blank" style="display: inline-block; padding: 10px 20px; background: var(--btn-color); color: white; text-decoration: none; border-radius: 6px;">GitHub 仓库</a></p>
+                <p style="color: #888; font-size: 12px; margin-top: 20px;">© 2026 殷离Shadon</p>
             </div>
         </div>
     </div>
@@ -1377,9 +1385,15 @@
             const basePath = 'Character/';
             const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp'];
 
+            console.log('开始加载预设角色...');
+            console.log('当前页面地址:', window.location.href);
+
             // 尝试使用 fetch 读取目录（需要服务器开启目录浏览）
             try {
+                console.log('尝试使用 fetch 读取目录...');
                 const response = await fetch(basePath);
+                console.log('fetch 响应状态:', response.status, response.ok);
+
                 if (response.ok) {
                     const text = await response.text();
                     const parser = new DOMParser();
@@ -1393,11 +1407,9 @@
                         if (!href || href.startsWith('?') || href === '../') continue;
 
                         if (href.endsWith('/')) {
-                            // 子文件夹
                             const folderName = href.replace(/\/$/, '');
                             folders[folderName] = [];
                         } else {
-                            // 根目录的图片
                             const ext = href.substring(href.lastIndexOf('.')).toLowerCase();
                             if (imageExtensions.includes(ext)) {
                                 rootImages.push(href);
@@ -1405,7 +1417,6 @@
                         }
                     }
 
-                    // 读取子文件夹中的图片
                     for (const folder of Object.keys(folders)) {
                         try {
                             const folderResponse = await fetch(basePath + folder + '/');
@@ -1427,10 +1438,10 @@
                         }
                     }
 
-                    // 如果获取到任何文件，使用动态加载
                     const totalFiles = Object.values(folders).flat().length + rootImages.length;
+                    console.log('找到的文件总数:', totalFiles);
+
                     if (totalFiles > 0) {
-                        // 处理子文件夹中的图片
                         for (const [folder, files] of Object.entries(folders)) {
                             for (const file of files) {
                                 const name = file.replace(/\.[^/.]+$/, '');
@@ -1445,7 +1456,7 @@
                                 });
                             }
                         }
-                        // 处理根目录图片
+
                         for (const file of rootImages) {
                             const name = file.replace(/\.[^/.]+$/, '');
                             const avatarPath = basePath + file;
@@ -1458,7 +1469,7 @@
                                 category: '预设角色'
                             });
                         }
-                        console.log(`加载了 ${presetRoles.length} 个预设角色`);
+                        console.log(`通过 fetch 加载了 ${presetRoles.length} 个预设角色`);
                         return;
                     }
                 }
@@ -1466,11 +1477,12 @@
                 console.warn('Fetch 方式读取失败:', e);
             }
 
-            // 回退到硬编码列表
+            console.log('回退到硬编码列表...');
             await loadPresetRolesFallback();
         }
 
         async function loadPresetRolesFallback() {
+            console.log('loadPresetRolesFallback 被调用');
             const basePath = 'Character/';
             const folders = {
                 'IC玩家': ['AikesiX.png'],
@@ -1498,6 +1510,7 @@
                     });
                 }
             }
+            console.log(`通过 fallback 加载了 ${presetRoles.length} 个预设角色`);
         }
 
         // 选择对话
@@ -1538,27 +1551,21 @@
             }
         }
 
-        async function clearCurrentConversation() {
+        async function resetCurrentConversation() {
             if (!currentConversationId) {
                 showToast('请先选择一个对话', 'error');
                 return;
             }
-            const confirmed = await showConfirmDialog('清屏', '确定要清空当前对话的所有消息吗？');
+            const confirmed = await showConfirmDialog('重置', '确定要重置当前对话吗？对话名称和所有消息都将清空，且无法恢复！');
             if (!confirmed) return;
             const conv = conversations.find(c => c.id === currentConversationId);
-            if (conv && conv.messages && conv.messages.length > 0) {
-                const clearedMessages = [...conv.messages];
+            if (conv) {
                 conv.messages = [];
-                deletedMessages.push({ convId: currentConversationId, message: clearedMessages, isClear: true });
-                redoMessages = [];
+                conv.name = 'IWBTC Dialog Generator';
                 saveConversations();
+                document.getElementById('chatTitleInput').value = conv.name;
                 renderMessages();
-                showToast('对话已清空，可撤销', 'success');
-            } else if (conv) {
-                conv.messages = [];
-                saveConversations();
-                renderMessages();
-                showToast('对话已清空', 'success');
+                showToast('对话已重置', 'success');
             }
         }
 
@@ -1608,29 +1615,6 @@
                 if (role && role.avatar) return role.avatar;
             }
             return defaultAvatar;
-        }
-
-        function getPresetAvatarPath(name) {
-            const folders = {
-                'IC玩家': ['AikesiX.png'],
-                '游戏角色': [
-                    'Kid.png', '兔兔.png', '冰雪散人.png', '剑客散人.png', '圣诞散人.png',
-                    '夏日水果.png', '小刺.png', '小机器人.png', '小狼(旧).png', '小狼.png',
-                    '小草.png', '小鞭炮.png', '幽灵Kid.png', '探险者散人.png', '散人.png',
-                    '散娘.png', '水果猫.png', '特若.png', '猫耳散人.png', '福散.png',
-                    '窗花散人.png', '纯色Kid.png', '纯色散人.png', '线条Kid.png', '线条散人.png',
-                    '蜗牛小G.png', '雪花散人.png'
-                ]
-            };
-            for (const [folder, files] of Object.entries(folders)) {
-                for (const file of files) {
-                    const fileName = file.replace(/\.[^/.]+$/, '');
-                    if (fileName === name) {
-                        return 'Character/' + folder + '/' + file;
-                    }
-                }
-            }
-            return null;
         }
 
         // 渲染消息
@@ -1767,21 +1751,17 @@
                 conv.messages = [];
             }
 
-            if (lastDeleted.isClear) {
-                const restoredMessages = lastDeleted.message;
-                conv.messages = restoredMessages;
+            if (lastDeleted.isSent) {
+                let insertIndex = conv.messages.findIndex(m => m.timestamp > lastDeleted.message.timestamp);
+                if (insertIndex === -1) insertIndex = conv.messages.length;
+                conv.messages.splice(insertIndex, 0, lastDeleted.message);
                 redoMessages.push(lastDeleted);
-            } else if (lastDeleted.isSent) {
+            } else {
                 const msgIndex = conv.messages.findIndex(m => m.id === lastDeleted.message.id);
                 if (msgIndex !== -1) {
                     conv.messages.splice(msgIndex, 1);
                     redoMessages.push(lastDeleted);
                 }
-            } else {
-                let insertIndex = conv.messages.findIndex(m => m.timestamp > lastDeleted.message.timestamp);
-                if (insertIndex === -1) insertIndex = conv.messages.length;
-                conv.messages.splice(insertIndex, 0, lastDeleted.message);
-                redoMessages.push(lastDeleted);
             }
 
             console.log('Message restored, messages count:', conv.messages.length);
@@ -1808,20 +1788,17 @@
                 return;
             }
 
-            if (lastRedo.isClear) {
-                conv.messages = [];
-                deletedMessages.push(lastRedo);
-            } else if (lastRedo.isSent) {
-                let insertIndex = conv.messages.findIndex(m => m.timestamp > lastRedo.message.timestamp);
-                if (insertIndex === -1) insertIndex = conv.messages.length;
-                conv.messages.splice(insertIndex, 0, lastRedo.message);
-                deletedMessages.push(lastRedo);
-            } else {
+            if (lastRedo.isSent) {
                 const msgIndex = conv.messages.findIndex(m => m.id === lastRedo.message.id);
                 if (msgIndex !== -1) {
                     conv.messages.splice(msgIndex, 1);
                     deletedMessages.push(lastRedo);
                 }
+            } else {
+                let insertIndex = conv.messages.findIndex(m => m.timestamp > lastRedo.message.timestamp);
+                if (insertIndex === -1) insertIndex = conv.messages.length;
+                conv.messages.splice(insertIndex, 0, lastRedo.message);
+                deletedMessages.push(lastRedo);
             }
 
             saveConversations();
@@ -2591,32 +2568,33 @@
             if (!defaultAvatar) {
                 defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 48 48\'%3E%3Ccircle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23666\'/%3E%3C/svg%3E';
             }
+
             let imageSrc = src;
             if (!imageSrc.startsWith('http') && !imageSrc.startsWith('file') && !imageSrc.startsWith('data:')) {
                 imageSrc = new URL(imageSrc, window.location.href).href;
             }
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => {
-                    try {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = img.naturalWidth;
-                        canvas.height = img.naturalHeight;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0);
-                        resolve(canvas.toDataURL('image/png'));
-                    } catch (e) {
-                        console.warn('Canvas draw failed for:', src);
+
+            // 使用 fetch 方式加载图片，更好地处理编码和跨域
+            try {
+                const response = await fetch(imageSrc);
+                if (!response.ok) {
+                    console.warn('Fetch failed for:', src, 'status:', response.status);
+                    return defaultAvatar;
+                }
+                const blob = await response.blob();
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = () => {
+                        console.warn('FileReader failed for:', src);
                         resolve(defaultAvatar);
-                    }
-                };
-                img.onerror = () => {
-                    console.warn('Image load failed for:', src);
-                    resolve(defaultAvatar);
-                };
-                img.src = imageSrc;
-            });
+                    };
+                    reader.readAsDataURL(blob);
+                });
+            } catch (e) {
+                console.warn('Image load failed for:', src, e);
+                return defaultAvatar;
+            }
         }
 
         function isMobileDevice() {
@@ -2812,7 +2790,9 @@
             const now = new Date();
             footer.innerHTML = `
                 <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator</div>
-                <div>导出时间：${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}</div>
+                <div style="margin-bottom: 4px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M2.7 模型</div>
+                <div style="margin-bottom: 4px;"><a href="https://yinlishadon.github.io/IWBTCDialogGenerator/" target="_blank" style="color: var(--btn-color); text-decoration: none;">https://yinlishadon.github.io/IWBTCDialogGenerator/</a></div>
+                <div style="color: #888;">导出时间：${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}</div>
             `;
             exportDiv.appendChild(footer);
 
@@ -3039,6 +3019,17 @@
             }
 
             exportDiv.appendChild(messagesContainer);
+
+            const footer = document.createElement('div');
+            footer.style.cssText = 'text-align: center; font-size: 12px; color: #fff; padding-top: 8px; border-top: 1px solid #1a2a3a;';
+            const now = new Date();
+            footer.innerHTML = `
+                <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator</div>
+                <div style="margin-bottom: 4px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M2.7 模型</div>
+                <div style="margin-bottom: 4px;"><a href="https://yinlishadon.github.io/IWBTCDialogGenerator/" target="_blank" style="color: var(--btn-color); text-decoration: none;">https://yinlishadon.github.io/IWBTCDialogGenerator/</a></div>
+                <div style="color: #888;">导出时间：${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}</div>
+            `;
+            exportDiv.appendChild(footer);
 
             document.body.appendChild(exportDiv);
 
