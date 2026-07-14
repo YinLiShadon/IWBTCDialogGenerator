@@ -4,11 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IWBTC Dialog Generator - 《我想成为创造者》(I wanna be the Creator) 对话编辑器</title>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Han+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         @font-face {
             font-family: 'Liberation Sans';
-            src: local('Liberation Sans'), local('LiberationSans');
+            src: url('Font/LiberationSans-Regular_0.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Liberation Sans';
+            src: url('Font/LiberationSans-Bold_0.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Liberation Sans';
+            src: url('Font/LiberationSans-Italic_0.ttf') format('truetype');
+            font-weight: 400;
+            font-style: italic;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Liberation Sans';
+            src: url('Font/LiberationSans-BoldItalic_0.ttf') format('truetype');
+            font-weight: 700;
+            font-style: italic;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Source Han Sans SC';
+            src: url('Font/SourceHanSansSC-Regular_0.otf') format('opentype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Source Han Sans SC';
+            src: url('Font/SourceHanSansSC-Normal_0.otf') format('opentype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Source Han Sans SC';
+            src: url('Font/SourceHanSansSC-Bold_0.otf') format('opentype');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Source Han Sans SC';
+            src: url('Font/SourceHanSansSC-Medium_0.otf') format('opentype');
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Source Han Sans SC';
+            src: url('Font/SourceHanSansSC-Light_0.otf') format('opentype');
+            font-weight: 300;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Source Han Sans SC';
+            src: url('Font/SourceHanSansSC-ExtraLight_0.otf') format('opentype');
+            font-weight: 200;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Source Han Sans SC';
+            src: url('Font/SourceHanSansSC-Heavy_0.otf') format('opentype');
+            font-weight: 900;
+            font-style: normal;
+            font-display: swap;
         }
 
         * {
@@ -53,25 +125,29 @@
         }
 
         .chat-title-input {
-            background: transparent;
-            border: 1px solid transparent;
-            color: var(--text-color);
+            background: linear-gradient(90deg, transparent, rgba(45, 90, 123, 0.4) 20%, rgba(45, 90, 123, 0.4) 80%, transparent);
+            border: 1px solid #3a5a7a;
+            color: #cce4f5;
             font-size: 18px;
             font-weight: 700;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 8px 24px;
+            border-radius: 24px;
             font-family: inherit;
-            max-width: 300px;
+            min-width: 200px;
+            max-width: 500px;
+            text-align: center;
+            transition: background-color 0.2s, border-color 0.2s;
         }
 
         .chat-title-input:hover {
-            border-color: #444;
+            background: linear-gradient(90deg, transparent, rgba(45, 90, 123, 0.55) 20%, rgba(45, 90, 123, 0.55) 80%, transparent);
+            border-color: var(--btn-color);
         }
 
         .chat-title-input:focus {
             outline: none;
             border-color: var(--btn-color);
-            background: rgba(255,255,255,0.05);
+            background-color: rgba(45, 90, 123, 0.6);
         }
 
         .btn-clear {
@@ -1456,6 +1532,223 @@
             width: 40px;
             height: 40px;
         }
+
+        /* 文字格式工具栏 */
+        .text-format-toolbar {
+            display: flex;
+            gap: 4px;
+            padding: 6px 8px;
+            background-color: var(--sidebar-bg);
+            border: 1px solid #1a2a3a;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .text-format-toolbar .format-btn {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid #3a5a7a;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            min-width: 32px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .text-format-toolbar .format-btn:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .text-format-toolbar .format-btn.active {
+            background-color: var(--btn-color);
+            color: white;
+            border-color: var(--btn-color);
+        }
+
+        .text-format-toolbar .format-divider {
+            width: 1px;
+            height: 18px;
+            background-color: #3a5a7a;
+            margin: 0 2px;
+        }
+
+        .text-format-toolbar .color-picker-wrapper {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .text-format-toolbar input[type="color"] {
+            width: 32px;
+            height: 28px;
+            padding: 2px;
+            border: 1px solid #3a5a7a;
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            cursor: pointer;
+        }
+
+        /* 马赛克效果 */
+        .mosaic-text {
+            display: inline-block;
+            background-color: #555;
+            color: #555 !important;
+            text-shadow: none !important;
+            user-select: none;
+            border-radius: 2px;
+            padding: 0 2px;
+            cursor: pointer;
+        }
+
+        .mosaic-text::selection {
+            background-color: transparent;
+        }
+
+        /* 小对话标题（用于分割对话区块） */
+        .dialog-title-message {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0 12px 0;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dialog-title-message::before,
+        .dialog-title-message::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #3a5a7a, transparent);
+            max-width: 200px;
+        }
+
+        .dialog-title-bubble {
+            background-color: rgba(45, 90, 123, 0.4);
+            border: 1px solid #3a5a7a;
+            color: #cce4f5;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+            max-width: 70%;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .dialog-title-bubble:hover {
+            background-color: rgba(45, 90, 123, 0.7);
+            transform: scale(1.02);
+        }
+
+        .dialog-title-edit-input {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 2px solid var(--btn-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+            max-width: 70%;
+            width: 300px;
+            outline: none;
+        }
+
+        /* 裁剪/分割导出选项 */
+        .export-section-option {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            color: #ccc;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 4px;
+        }
+
+        .export-section-option:hover {
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .export-section-option input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        /* 颜色选择面板 */
+        .color-presets {
+            display: inline-flex;
+            gap: 2px;
+            margin-left: 4px;
+        }
+
+        .color-preset {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 1px solid #444;
+        }
+
+        .color-preset:hover {
+            transform: scale(1.1);
+        }
+
+        /* 角色管理 - 预设角色重命名按钮 */
+        .role-item-actions {
+            display: flex;
+            gap: 2px;
+            margin-top: 4px;
+        }
+
+        .role-item-actions button {
+            background-color: transparent;
+            color: #aaa;
+            border: 1px solid #3a5a7a;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 10px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .role-item-actions button:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        /* 编辑预设角色模态框 */
+        #editPresetRoleModal .form-group {
+            margin-bottom: 12px;
+        }
+
+        .preset-original-name {
+            color: #888;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .avatar-readonly-hint {
+            display: inline-block;
+            margin-top: 8px;
+            color: #888;
+            font-size: 12px;
+            font-style: italic;
+        }
+
+        /* 预设角色头像预览（不可点击） */
+        #editPresetRoleAvatarPreview {
+            cursor: not-allowed;
+            opacity: 0.85;
+        }
     </style>
 </head>
 <body>
@@ -1515,6 +1808,22 @@
                     </div>
                 <div class="file-preview" id="filePreview"></div>
                 <input type="file" class="hidden-input" id="fileInput" multiple accept="image/*" onchange="onFileSelect()">
+                <div class="text-format-toolbar" id="textFormatToolbar">
+                    <button class="format-btn" data-format="bold" onclick="toggleTextFormat('bold')" title="粗体"><b>B</b></button>
+                    <button class="format-btn" data-format="italic" onclick="toggleTextFormat('italic')" title="斜体"><i>I</i></button>
+                    <button class="format-btn" data-format="underline" onclick="toggleTextFormat('underline')" title="下划线"><u>U</u></button>
+                    <button class="format-btn" data-format="strikethrough" onclick="toggleTextFormat('strikethrough')" title="删除线"><s>S</s></button>
+                    <span class="format-divider"></span>
+                    <span class="color-picker-wrapper">
+                        <input type="color" id="textColorPicker" value="#ffffff" onchange="applyTextColor(this.value)" title="文字颜色">
+                    </span>
+                    <span class="color-presets" id="colorPresets"></span>
+                    <span class="format-divider"></span>
+                    <button class="format-btn" data-format="mosaic" onclick="toggleTextFormat('mosaic')" title="马赛克">▓</button>
+                    <button class="format-btn" data-format="reset" onclick="resetTextFormat()" title="清除格式">🧹</button>
+                    <span class="format-divider"></span>
+                    <button class="format-btn" onclick="insertDialogTitle()" title="插入小对话标题（用于分割对话区块）" style="min-width:auto; padding: 4px 10px;">📌 插入标题</button>
+                </div>
                 <div class="input-row">
                     <button class="btn-file" onclick="document.getElementById('fileInput').click()">🖼️ <span>图片</span></button>
                     <textarea class="message-input" id="messageInput" placeholder="输入消息..." rows="1" onkeydown="handleKeyDown(event)"></textarea>
@@ -1606,6 +1915,13 @@
                 <button class="aspect-ratio-btn" data-ratio="16:9" onclick="setExportPreviewRatio('16:9')">横屏</button>
                 <button class="aspect-ratio-btn" data-ratio="9:16" onclick="setExportPreviewRatio('9:16')">竖屏</button>
             </div>
+            <div style="text-align: center; margin: 12px 0 8px 0; font-size: 13px; color: #888;">导出选项</div>
+            <div style="display: flex; justify-content: center; flex-direction: column; gap: 4px; max-width: 320px; margin: 0 auto;">
+                <label class="export-section-option">
+                    <input type="checkbox" id="exportSplitByTitle" onchange="onExportOptionChange()">
+                    <span>按小对话标题分割裁剪（每段保存为单独图片）</span>
+                </label>
+            </div>
         </div>
         <div class="export-preview-content" id="exportPreviewContent"></div>
         <div class="export-preview-actions">
@@ -1635,17 +1951,17 @@
             </div>
             <div style="text-align: center; padding: 20px;">
                 <h2 style="margin: 0 0 8px 0;">IWBTC Dialog Generator</h2>
-                <p style="color: #888; margin: 0 0 16px 0;">版本 2026.07.14a</p>
+                <p style="color: #888; margin: 0 0 16px 0;">版本 2026.07.14b</p>
                 <p style="line-height: 1.6;">《我想成为创造者》(I wanna be the Creator) 对话编辑器 (二创工具)</p>
                 <p style="line-height: 1.6;">你可以使用它来创建和编辑对话以制作IC二创内容！</p>
-                <p style="line-height: 1.6; margin-top: 8px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M2.7 模型</p>
+                <p style="line-height: 1.6; margin-top: 8px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M3 模型</p>
                 <p style="line-height: 1.6; margin-top: 16px; text-align: left;">免责声明：</p>
                 <p style="line-height: 1.6; text-align: left; color: #aaa;">1. 仅供娱乐，请勿过度解读</p>
                 <p style="line-height: 1.6; text-align: left; color: #aaa;">2. 角色图片来源于游戏解包和网络，本人不具有上述图片版权</p>
                 <p style="line-height: 1.6; text-align: left; color: #aaa;">3. 此工具与AikesiX和游戏《我想成为创造者》(I wanna be the Creator) 无直接关联</p>
                 <p style="line-height: 1.6; margin-top: 16px; text-align: left;">灵感来源：</p>
                 <p style="line-height: 1.6; text-align: left; color: #aaa;">1. 仿照微信、QQ聊天界面的工具</p>
-                <p style="line-height: 1.6; text-align: left; color: #aaa;">2. Yuzutalk/Momotalk (蔚蓝档案对话编辑器)：<a href="https://www.yuzutalk.net/" target="_blank" style="color: var(--btn-color);">https://www.yuzutalk.net/</a></p>
+                <p style="line-height: 1.6; text-align: left; color: #aaa;">2. Yuzutalk/Momotalk (蔚蓝档案对话编辑器)：<a href="https://www.yuzutalk.net/" target="_blank" style="color: var(--btn-color);">https://www.yuzutalk.net/</a>，<a href="https://u1805.github.io/momotalk/" target="_blank" style="color: var(--btn-color);">https://u1805.github.io/momotalk/</a></p>
                 <p style="line-height: 1.6; text-align: left; color: #aaa;">3. Closure Talk (明日方舟与蔚蓝档案对话编辑器)：<a href="https://closuretalk.github.io/" target="_blank" style="color: var(--btn-color);">https://closuretalk.github.io/</a></p>
                 <p style="line-height: 1.6; text-align: left; color: #aaa;">4. MayerTalk (明日方舟对话编辑器)：<a href="https://www.mayertalk.top/" target="_blank" style="color: var(--btn-color);">https://www.mayertalk.top/</a></p>
                 <p style="margin-top: 16px;"><a href="https://github.com/YinLiShadon/IWBTCDialogGenerator" target="_blank" style="display: inline-block; padding: 10px 20px; background: var(--btn-color); color: white; text-decoration: none; border-radius: 6px;">GitHub 仓库</a></p>
@@ -1664,12 +1980,14 @@
             <div style="padding: 20px; max-height: 500px; overflow-y: auto;">
                 <h3 style="color: var(--btn-color); margin: 0 0 12px 0;">功能介绍</h3>
                 <ul style="margin: 0 0 20px 0; padding-left: 20px; line-height: 1.8;">
-                    <li><strong>发送消息：</strong>选择发送者（自己/旁白/自定义角色），输入消息内容并发送</li>
+                    <li><strong>发送消息：</strong>选择发送者（自己/旁白/预设/自定义角色），输入消息内容并发送</li>
                     <li><strong>删除消息：</strong>使用"选择"模式勾选后删除，或直接点击删除按钮</li>
                     <li><strong>撤消/重做：</strong>支持撤消和重做最近的操作</li>
-                    <li><strong>导出图片：</strong>点击"导出图片"可生成带样式的对话截图</li>
-                    <li><strong>角色管理：</strong>可添加、编辑、删除自定义角色</li>
+                    <li><strong>导出图片：</strong>点击"导出图片"可生成带样式的对话截图，可选按小对话标题分割为多张图</li>
+                    <li><strong>角色管理：</strong>可添加、编辑、删除自定义角色；可重命名预设角色（仅显示名）</li>
                     <li><strong>重命名对话：</strong>点击顶部对话名称可直接修改</li>
+                    <li><strong>小对话标题：</strong>点击工具栏"插入标题"可添加分割标题，导出图片时可按此分割</li>
+                    <li><strong>文字格式：</strong>输入框上方工具栏：选中文本后点击 <b>B</b>（粗）/ <i>I</i>（斜）/ <u>U</u>（下划线）/ <s>S</s>（删除线）/ 调色板（颜色）/ ▓（马赛克）/ 🧹（清除）</li>
                 </ul>
                 <h3 style="color: var(--btn-color); margin: 0 0 12px 0;">快捷操作</h3>
                 <ul style="margin: 0 0 20px 0; padding-left: 20px; line-height: 1.8;">
@@ -1680,9 +1998,10 @@
                 </ul>
                 <h3 style="color: var(--btn-color); margin: 0 0 12px 0;">使用提示</h3>
                 <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
-                    <li>自己的头像和名称、对话名称可直接点击编辑</li>
+                    <li>自己的头像和名称、大小对话名称可直接点击编辑</li>
                     <li>选择模式支持多选批量删除</li>
-                    <li>导出前可在预览中调整</li>
+                    <li>预设角色重命名不影响文件名（仅显示名）</li>
+                    <li>导出图片选择"按小对话标题分割"时，每段会保存为独立图片</li>
                 </ul>
             </div>
         </div>
@@ -1696,13 +2015,20 @@
                 <button class="modal-close" onclick="closeModal('changelogModal')">&times;</button>
             </div>
             <div style="padding: 20px; max-height: 400px; overflow-y: auto;">
+                <h3 style="color: var(--btn-color); margin: 0 0 8px 0;">版本 2026.07.14b</h3>
+                <ul style="margin: 0 0 16px 0; padding-left: 20px; line-height: 1.8;">
+                    <li>更新【简介】【使用指南】、顶部标题样式、字体加载方式</li>
+                    <li>添加文字个性化、小对话、编辑预设角色名称、导出图片按小对话裁剪功能</li>
+                </ul>
                 <h3 style="color: var(--btn-color); margin: 0 0 8px 0;">版本 2026.07.14a</h3>
                 <ul style="margin: 0 0 16px 0; padding-left: 20px; line-height: 1.8;">
                     <li>修复移动端无法选择发送者的BUG，添加正在加载对话提醒和进度</li>
                 </ul>
                 <h3 style="color: var(--btn-color); margin: 0 0 8px 0;">版本 2026.07.13b</h3>
                 <ul style="margin: 0 0 16px 0; padding-left: 20px; line-height: 1.8;">
-                    <li>更改介绍、导出图片的名字格式，添加【使用指南】、【更新日志】、按钮图标、快捷键操作功能、导出图片显示版本号，适配移动设备</li>
+                    <li>更改介绍、导出图片的名字格式
+                    <li>添加【使用指南】、【更新日志】、按钮图标、快捷键操作、导出图片显示版本号功能</li>
+                    <li>适配移动设备</li>   
                 </ul>
                 <h3 style="color: var(--btn-color); margin: 0 0 8px 0;">版本 2026.07.13a</h3>
                 <ul style="margin: 0 0 16px 0; padding-left: 20px; line-height: 1.8;">
@@ -1735,6 +2061,51 @@
         </div>
     </div>
 
+    <!-- 插入小对话标题模态框 -->
+    <div class="modal" id="insertDialogTitleModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <span class="modal-title">📌 插入小对话标题</span>
+                <button class="modal-close" onclick="closeModal('insertDialogTitleModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>小标题文字</label>
+                <input type="text" id="insertDialogTitleInput" placeholder="例如：场景一、相识、战斗开始..." maxlength="50" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmInsertDialogTitle();}">
+                <div class="preset-original-name" style="margin-top: 6px;">小标题用于分割对话区块，导出图片时可按此分割</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-create-role" onclick="closeModal('insertDialogTitleModal')" style="flex:1; background-color: #555;">✕ 取消</button>
+                <button class="btn-create-role" onclick="confirmInsertDialogTitle()" style="flex:1;">✔️ 确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑预设角色模态框 -->
+    <div class="modal" id="editPresetRoleModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <span class="modal-title">编辑预设角色</span>
+                <button class="modal-close" onclick="closeModal('editPresetRoleModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>名称（仅显示名，原始名不变）</label>
+                <input type="text" id="editPresetRoleName" placeholder="输入新的角色名称">
+                <div class="preset-original-name" id="presetOriginalName"></div>
+            </div>
+            <div class="form-group">
+                <label>头像（不可更改）</label>
+                <div class="avatar-upload">
+                    <img id="editPresetRoleAvatarPreview" src="" alt="">
+                    <span class="avatar-readonly-hint">预设角色头像不可更改</span>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-create-role" onclick="resetPresetRoleName()" style="flex:1; background-color: #d32f2f;">🧹 还原默认名</button>
+                <button class="btn-create-role" onclick="savePresetRoleEdit()" style="flex:1;">✔️ 确定</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 编辑自定义角色模态框 -->
     <div class="modal" id="editCustomRoleModal">
         <div class="modal-content" style="max-width: 400px;">
@@ -1759,8 +2130,8 @@
                 </div>
             </div>
             <div style="display: flex; gap: 8px;">
-                <button class="btn-create-role" onclick="saveCustomRoleEdit()" style="flex:1;">✔️ 保存</button>
                 <button class="btn-create-role" onclick="confirmDeleteCustomRole()" style="flex:1; background-color: #d32f2f;">🗑️ 删除</button>
+                <button class="btn-create-role" onclick="saveCustomRoleEdit()" style="flex:1;">✔️ 确定</button>
             </div>
         </div>
     </div>
@@ -1772,6 +2143,7 @@
         let currentConversationId = null;
         let presetRoles = [];
         let customRoles = JSON.parse(localStorage.getItem('customRoles') || '[]');
+        let presetRoleCustomNames = JSON.parse(localStorage.getItem('presetRoleCustomNames') || '{}');
         let selfConfig = JSON.parse(localStorage.getItem('selfConfig') || '{"name":"我","avatar":""}');
         let selectedFiles = [];
         let currentSenderValue = 'self';
@@ -1779,6 +2151,19 @@
         let redoMessages = [];
         let messageSelectionMode = false;
         let selectedMessages = new Set();
+
+        // 文字格式状态
+        const textFormatState = {
+            bold: false,
+            italic: false,
+            underline: false,
+            strikethrough: false,
+            mosaic: false,
+            color: null
+        };
+
+        // 预设颜色
+        const presetColors = ['#FFFFFF', '#FF6B6B', '#FFA94D', '#FFD43B', '#69DB7C', '#4DABF7', '#9775FA', '#F783AC'];
 
         // Toast 提示
         function showToast(message, type = 'info') {
@@ -1816,6 +2201,25 @@
             }
         }
 
+        // 获取预设角色的显示名（自定义名优先）
+        function getPresetDisplayName(originalName) {
+            return presetRoleCustomNames[originalName] || originalName;
+        }
+
+        // 获取预设角色的原始名（用于头像匹配）
+        function getPresetOriginalName(role) {
+            // role.originalName 存储原始名称（如果设置了自定义名）
+            return role.originalName || role.name;
+        }
+
+        // 初始化时为 presetRoles 加上 originalName 字段
+        function ensurePresetRoleOriginalName(role) {
+            if (!role.originalName) {
+                role.originalName = role.name;
+            }
+            return role;
+        }
+
         // 初始化
         document.addEventListener('DOMContentLoaded', async () => {
             const loadingOverlay = document.getElementById('loadingOverlay');
@@ -1833,6 +2237,7 @@
             loadConversations();
             setLoadingProgress(30, '正在加载预设角色...');
 
+            initColorPresets();
             await loadPresetRoles();
             setLoadingProgress(60, '正在渲染界面...');
 
@@ -1937,7 +2342,8 @@
                                 const avatarDataUrl = await imageToDataURL(avatarPath);
                                 presetRoles.push({
                                     id: `preset_${name}`,
-                                    name: name,
+                                    name: getPresetDisplayName(name),
+                                    originalName: name,
                                     avatar: avatarDataUrl,
                                     type: 'preset',
                                     category: folder
@@ -1951,7 +2357,8 @@
                             const avatarDataUrl = await imageToDataURL(avatarPath);
                             presetRoles.push({
                                 id: `preset_${name}`,
-                                name: name,
+                                name: getPresetDisplayName(name),
+                                originalName: name,
                                 avatar: avatarDataUrl,
                                 type: 'preset',
                                 category: '预设角色'
@@ -1991,7 +2398,8 @@
                     const avatarDataUrl = await imageToDataURL(avatarPath);
                     presetRoles.push({
                         id: `preset_${name}`,
-                        name: name,
+                        name: getPresetDisplayName(name),
+                        originalName: name,
                         avatar: avatarDataUrl,
                         type: 'preset',
                         category: folder
@@ -2074,7 +2482,9 @@
                 return sender.avatar;
             }
             if (sender.type === 'preset') {
-                const role = presetRoles.find(r => r.name === sender.name);
+                // 使用 originalName 匹配
+                const origName = sender.originalName || sender.name;
+                const role = presetRoles.find(r => (r.originalName || r.name) === origName);
                 if (role && role.avatar && role.avatar.startsWith('data:image')) {
                     return role.avatar;
                 }
@@ -2092,7 +2502,7 @@
                 for (const [folder, files] of Object.entries(folders)) {
                     for (const file of files) {
                         const fileName = file.replace(/\.[^/.]+$/, '');
-                        if (fileName === sender.name) {
+                        if (fileName === origName) {
                             const path = 'Character/' + folder + '/' + file;
                             return path;
                         }
@@ -2122,12 +2532,21 @@
                 wrapper.className = 'message-wrapper';
                 wrapper.dataset.msgId = msg.id;
 
-                if (msg.sender.type === 'narrator') {
+                if (msg.type === 'dialog-title') {
+                    // 小对话标题（用于分割对话区块）
+                    wrapper.classList.add('dialog-title-message');
+                    const checkboxHtml = messageSelectionMode ? `<input type="checkbox" class="message-checkbox" ${selectedMessages.has(msg.id) ? 'checked' : ''} onchange="toggleMessageSelection('${msg.id}')">` : '';
+                    wrapper.innerHTML = `
+                        ${checkboxHtml}
+                        <div class="dialog-title-bubble" onclick="startEditDialogTitle('${msg.id}')" title="单击编辑">${escapeHtml(msg.content || '（无标题）')}</div>
+                        ${!messageSelectionMode ? `<button class="message-delete-btn" onclick="deleteMessage('${msg.id}').catch(console.error)" style="color: #cce4f5;">🗑️</button>` : ''}
+                    `;
+                } else if (msg.sender.type === 'narrator') {
                     wrapper.classList.add('narrator');
                     const checkboxHtml = messageSelectionMode ? `<input type="checkbox" class="message-checkbox" ${selectedMessages.has(msg.id) ? 'checked' : ''} onchange="toggleMessageSelection('${msg.id}')">` : '';
                     wrapper.innerHTML = `
                         ${checkboxHtml}
-                        <div class="message-bubble">${msg.content}</div>
+                        <div class="message-bubble" style="white-space: pre-wrap;">${msg.content}</div>
                         ${!messageSelectionMode ? `<button class="message-delete-btn" onclick="deleteMessage('${msg.id}').catch(console.error)">🗑️</button>` : ''}
                     `;
                 } else if (msg.sender.type === 'self') {
@@ -2138,7 +2557,7 @@
                         ${checkboxHtml}
                         <img class="message-avatar" src="${avatar}" alt="">
                         <div class="message-content-wrapper">
-                            ${msg.sender.name !== '我' ? `<div class="message-sender">${msg.sender.name}</div>` : ''}
+                            ${msg.sender.name !== '我' ? `<div class="message-sender">${escapeHtml(msg.sender.name)}</div>` : ''}
                             <div class="message-bubble">
                                 <div class="message-content">${msg.content || ''}</div>
                                 ${renderFiles(msg.files)}
@@ -2157,7 +2576,7 @@
                         ${checkboxHtml}
                         <img class="message-avatar" src="${getAvatarForSender(msg.sender)}" alt="">
                         <div class="message-content-wrapper">
-                            <div class="message-sender">${msg.sender.name}</div>
+                            <div class="message-sender">${escapeHtml(msg.sender.name)}</div>
                             <div class="message-bubble">
                                 <div class="message-content">${msg.content || ''}</div>
                                 ${renderFiles(msg.files)}
@@ -2183,6 +2602,56 @@
             requestAnimationFrame(() => {
                 container.scrollTop = container.scrollHeight;
             });
+        }
+
+        // HTML 转义函数，避免用户输入破坏页面
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // 双击编辑小对话标题
+        function startEditDialogTitle(msgId) {
+            const conv = conversations.find(c => c.id === currentConversationId);
+            if (!conv) return;
+            const msg = conv.messages.find(m => m.id === msgId);
+            if (!msg) return;
+
+            const wrapper = document.querySelector(`[data-msg-id="${msgId}"]`);
+            if (!wrapper) return;
+            const bubble = wrapper.querySelector('.dialog-title-bubble');
+            if (!bubble) return;
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'dialog-title-edit-input';
+            input.value = msg.content || '';
+
+            const save = () => {
+                const newVal = input.value.trim() || '（无标题）';
+                msg.content = newVal;
+                saveConversations();
+                renderMessages();
+            };
+
+            input.addEventListener('blur', save);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    input.blur();
+                } else if (e.key === 'Escape') {
+                    renderMessages();
+                }
+            });
+
+            bubble.replaceWith(input);
+            input.focus();
+            input.select();
         }
 
         // 渲染文件
@@ -2477,9 +2946,9 @@
                     item.className = 'role-item';
                     item.innerHTML = `
                         <img src="${role.avatar}" alt="${role.name}">
-                        <span>${role.name}</span>
+                        <span title="原名：${role.originalName || role.name}（点击编辑）">${role.name}</span>
                     `;
-                    item.onclick = () => showToast('预设角色不可编辑', 'info');
+                    item.onclick = () => showEditPresetRoleModal(role.originalName || role.name);
                     grid.appendChild(item);
                 });
                 presetCategoriesContainer.appendChild(section);
@@ -2550,7 +3019,7 @@
                 for (const [category, roles] of Object.entries(presetCategories)) {
                     html += `<div class="dropdown-group-label">预设 - ${category}</div>`;
                     roles.forEach(role => {
-                        html += `<div class="dropdown-option" data-value="preset_${role.name}" data-name="${role.name}" data-avatar="${role.avatar}">`;
+                        html += `<div class="dropdown-option" data-value="preset_${role.originalName || role.name}" data-name="${role.name}" data-avatar="${role.avatar}">`;
                         html += `<img src="${role.avatar}" alt="">`;
                         html += `<span>${role.name}</span></div>`;
                     });
@@ -2833,6 +3302,101 @@
             editCustomRoleAvatarData = null;
         }
 
+        // 显示编辑预设角色模态框
+        let editingPresetRoleOriginalName = null;
+        function showEditPresetRoleModal(originalName) {
+            const role = presetRoles.find(r => (r.originalName || r.name) === originalName);
+            if (!role) return;
+            editingPresetRoleOriginalName = originalName;
+            document.getElementById('editPresetRoleName').value = role.name;
+            document.getElementById('presetOriginalName').textContent = `原名：${originalName}`;
+            document.getElementById('editPresetRoleAvatarPreview').src = role.avatar || '';
+            document.getElementById('editPresetRoleModal').classList.add('active');
+        }
+
+        // 保存预设角色编辑
+        function savePresetRoleEdit() {
+            const newName = document.getElementById('editPresetRoleName').value.trim();
+            if (!newName || !editingPresetRoleOriginalName) return;
+
+            presetRoleCustomNames[editingPresetRoleOriginalName] = newName;
+            localStorage.setItem('presetRoleCustomNames', JSON.stringify(presetRoleCustomNames));
+
+            // 更新内存中的角色
+            presetRoles.forEach(r => {
+                if ((r.originalName || r.name) === editingPresetRoleOriginalName) {
+                    r.name = newName;
+                }
+            });
+
+            // 更新所有消息中此角色的名称显示
+            conversations.forEach(conv => {
+                if (conv.messages) {
+                    conv.messages.forEach(msg => {
+                        if (msg.sender && msg.sender.type === 'preset' && (msg.sender.originalName || msg.sender.name) === editingPresetRoleOriginalName) {
+                            msg.sender.name = newName;
+                        }
+                    });
+                }
+            });
+            saveConversations();
+
+            renderRoleManager();
+            renderMessages();
+            closeModal('editPresetRoleModal');
+            showToast('保存成功', 'success');
+        }
+
+        // 还原预设角色默认名（在模态框中点击）
+        function resetPresetRoleName() {
+            if (!editingPresetRoleOriginalName) return;
+            delete presetRoleCustomNames[editingPresetRoleOriginalName];
+            localStorage.setItem('presetRoleCustomNames', JSON.stringify(presetRoleCustomNames));
+            presetRoles.forEach(r => {
+                if ((r.originalName || r.name) === editingPresetRoleOriginalName) {
+                    r.name = r.originalName;
+                }
+            });
+            conversations.forEach(conv => {
+                if (conv.messages) {
+                    conv.messages.forEach(msg => {
+                        if (msg.sender && msg.sender.type === 'preset' && (msg.sender.originalName || msg.sender.name) === editingPresetRoleOriginalName) {
+                            msg.sender.name = msg.sender.originalName || msg.sender.name;
+                        }
+                    });
+                }
+            });
+            saveConversations();
+            renderRoleManager();
+            renderMessages();
+            closeModal('editPresetRoleModal');
+            showToast('已还原默认名', 'success');
+        }
+
+        // 通过列表中的按钮还原预设角色默认名
+        function resetPresetRoleNameById(originalName) {
+            delete presetRoleCustomNames[originalName];
+            localStorage.setItem('presetRoleCustomNames', JSON.stringify(presetRoleCustomNames));
+            presetRoles.forEach(r => {
+                if ((r.originalName || r.name) === originalName) {
+                    r.name = r.originalName;
+                }
+            });
+            conversations.forEach(conv => {
+                if (conv.messages) {
+                    conv.messages.forEach(msg => {
+                        if (msg.sender && msg.sender.type === 'preset' && (msg.sender.originalName || msg.sender.name) === originalName) {
+                            msg.sender.name = msg.sender.originalName || msg.sender.name;
+                        }
+                    });
+                }
+            });
+            saveConversations();
+            renderRoleManager();
+            renderMessages();
+            showToast('已还原默认名', 'success');
+        }
+
         // 确认删除自定义角色
         function confirmDeleteCustomRole() {
             if (!editingCustomRoleId) return;
@@ -2917,6 +3481,171 @@
             }
         }
 
+        // ============== 文字格式功能 ==============
+        // 将纯文本转换为带 HTML 格式的字符串
+        function applyFormattingToContent(content) {
+            if (!content) return '';
+            // content 中已包含 <span class="formatted-text"> 包裹的格式片段
+            // 这里直接将 content 返回（已格式化的 HTML）
+            return content;
+        }
+
+        // 切换文字格式（B/I/U/S/马赛克）
+        function toggleTextFormat(format) {
+            const input = document.getElementById('messageInput');
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+
+            if (format === 'mosaic') {
+                // 马赛克模式：点击时直接应用到当前选中的文字
+                applyMosaicToSelected();
+                return;
+            }
+
+            // 对其他格式，包裹选中文本
+            if (start === end) {
+                showToast('请先选择要格式化的文字', 'info');
+                return;
+            }
+
+            const selected = input.value.substring(start, end);
+            const tagMap = {
+                bold: { open: '<b>', close: '</b>' },
+                italic: { open: '<i>', close: '</i>' },
+                underline: { open: '<u>', close: '</u>' },
+                strikethrough: { open: '<s>', close: '</s>' }
+            };
+
+            const tags = tagMap[format];
+            if (!tags) return;
+
+            // 检查是否已应用此格式
+            const before = input.value.substring(Math.max(0, start - tags.open.length), start);
+            const after = input.value.substring(end, Math.min(input.value.length, end + tags.close.length));
+            if (before === tags.open && after === tags.close) {
+                // 移除格式
+                const newValue = input.value.substring(0, start - tags.open.length) + selected + input.value.substring(end + tags.close.length);
+                input.value = newValue;
+                input.setSelectionRange(start - tags.open.length, end - tags.open.length);
+            } else {
+                // 添加格式
+                const newValue = input.value.substring(0, start) + tags.open + selected + tags.close + input.value.substring(end);
+                input.value = newValue;
+                input.setSelectionRange(start + tags.open.length, end + tags.open.length);
+            }
+        }
+
+        // 应用文字颜色
+        function applyTextColor(color) {
+            const input = document.getElementById('messageInput');
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const selected = input.value.substring(start, end);
+            if (start === end) {
+                showToast('请先选择要设置颜色的文字', 'info');
+                return;
+            }
+            const openTag = `<span style="color: ${color};">`;
+            const closeTag = '</span>';
+            const newValue = input.value.substring(0, start) + openTag + selected + closeTag + input.value.substring(end);
+            input.value = newValue;
+            input.setSelectionRange(start + openTag.length, end + openTag.length);
+        }
+
+        // 重置文字格式
+        function resetTextFormat() {
+            const input = document.getElementById('messageInput');
+            // 移除所有常见 HTML 标签
+            input.value = input.value.replace(/<\/?(b|i|u|s|span)[^>]*>/g, '');
+            textFormatState.mosaic = false;
+            updateFormatButtonState('mosaic', false);
+            showToast('已清除格式', 'info');
+        }
+
+        // 更新格式按钮的 active 状态
+        function updateFormatButtonState(format, isActive) {
+            const btn = document.querySelector(`.format-btn[data-format="${format}"]`);
+            if (btn) btn.classList.toggle('active', isActive);
+        }
+
+        // 应用马赛克到选中的文字
+        function applyMosaicToSelected() {
+            const input = document.getElementById('messageInput');
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const selected = input.value.substring(start, end);
+            if (start === end) {
+                showToast('请先选择要打马赛克的文字', 'info');
+                return;
+            }
+            const openTag = '<span class="mosaic-text">';
+            const closeTag = '</span>';
+            const newValue = input.value.substring(0, start) + openTag + selected + closeTag + input.value.substring(end);
+            input.value = newValue;
+            input.setSelectionRange(start + openTag.length, end + openTag.length);
+        }
+
+        // 初始化颜色预设按钮
+        function initColorPresets() {
+            const container = document.getElementById('colorPresets');
+            if (!container) return;
+            container.innerHTML = '';
+            presetColors.forEach(color => {
+                const span = document.createElement('span');
+                span.className = 'color-preset';
+                span.style.backgroundColor = color;
+                span.title = color;
+                span.onclick = () => applyTextColor(color);
+                container.appendChild(span);
+            });
+        }
+
+        // 打开插入小对话标题模态框
+        function insertDialogTitle() {
+            if (!currentConversationId) {
+                // 创建默认对话
+                const conv = {
+                    id: 'conv_' + Date.now(),
+                    name: '新对话',
+                    messages: [],
+                    createdAt: Date.now()
+                };
+                conversations.unshift(conv);
+                currentConversationId = conv.id;
+                document.getElementById('chatTitleInput').value = conv.name;
+            }
+            const inputEl = document.getElementById('insertDialogTitleInput');
+            inputEl.value = '';
+            document.getElementById('insertDialogTitleModal').classList.add('active');
+            setTimeout(() => inputEl.focus(), 50);
+        }
+
+        // 确认插入小对话标题
+        function confirmInsertDialogTitle() {
+            const title = (document.getElementById('insertDialogTitleInput').value || '').trim();
+            if (!title) {
+                showToast('请输入小标题文字', 'info');
+                return;
+            }
+
+            const conv = conversations.find(c => c.id === currentConversationId);
+            if (!conv) return;
+            if (!conv.messages) conv.messages = [];
+            const message = {
+                id: 'msg_' + Date.now(),
+                type: 'dialog-title',
+                sender: { type: 'system', name: 'title' },
+                content: title,
+                files: [],
+                timestamp: Date.now()
+            };
+            conv.messages.push(message);
+            deletedMessages.push({ convId: conv.id, message: message, isSent: true });
+            saveConversations();
+            renderMessages();
+            closeModal('insertDialogTitleModal');
+        }
+
         // 全局键盘快捷键
         document.addEventListener('keydown', function(event) {
             if (event.ctrlKey || event.metaKey) {
@@ -2931,7 +3660,12 @@
         });
 
         async function sendMessage() {
-            const content = document.getElementById('messageInput').value.trim();
+            const inputEl = document.getElementById('messageInput');
+            const rawValue = inputEl.value;
+            // 提取纯文本（去除 HTML 标签）用于检查内容是否为空
+            const content = rawValue.replace(/<[^>]*>/g, '').trim();
+            // 实际保存带格式的 HTML 内容
+            const contentHtml = rawValue.trim();
 
             if (!content && selectedFiles.length === 0) {
                 showToast('请输入消息内容', 'info');
@@ -2966,11 +3700,12 @@
                 };
             } else if (currentSenderValue.startsWith('preset_')) {
                 const roleName = currentSenderValue.replace('preset_', '');
-                const role = presetRoles.find(r => r.name === roleName);
+                const role = presetRoles.find(r => (r.originalName || r.name) === roleName);
                 if (role) {
                     sender = {
                         type: 'preset',
                         name: role.name,
+                        originalName: role.originalName || role.name,
                         avatar: role.avatar
                     };
                 }
@@ -3050,9 +3785,9 @@
 
             const message = {
                 id: 'msg_' + Date.now(),
-                type: content && fileDataArray.length > 0 ? 'mixed' : (fileDataArray.length > 0 ? 'file' : 'text'),
+                type: contentHtml && fileDataArray.length > 0 ? 'mixed' : (fileDataArray.length > 0 ? 'file' : 'text'),
                 sender: sender,
-                content: content,
+                content: contentHtml,
                 files: fileDataArray,
                 timestamp: Date.now()
             };
@@ -3133,6 +3868,34 @@
             generateExportPreview();
         }
 
+        function onExportOptionChange() {
+            generateExportPreview();
+        }
+
+        // 将消息按 dialog-title 分割为多个段落
+        function splitMessagesByTitle(messages) {
+            const sections = [];
+            let current = { title: null, messages: [] };
+            messages.forEach(msg => {
+                if (msg.type === 'dialog-title') {
+                    if (current.messages.length > 0 || current.title) {
+                        sections.push(current);
+                    }
+                    current = { title: msg.content || '（无标题）', messages: [] };
+                } else {
+                    current.messages.push(msg);
+                }
+            });
+            if (current.messages.length > 0 || current.title) {
+                sections.push(current);
+            }
+            // 如果没有任何标题，则整体作为一段
+            if (sections.length === 0) {
+                sections.push({ title: null, messages: messages });
+            }
+            return sections;
+        }
+
         function showImagePreview(src) {
             document.getElementById('imagePreviewContent').src = src;
             document.getElementById('imagePreviewModal').classList.add('active');
@@ -3145,14 +3908,150 @@
         function closeExportPreview() {
             document.getElementById('exportPreviewModal').classList.remove('active');
             pendingCanvas = null;
+            pendingCanvases = [];
         }
 
-        async function generateExportPreview() {
-            if (!currentConversationId) return;
+        // 创建导出消息 DOM（用于单段导出，可复用）
+        async function createExportMessageElement(msg) {
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = `
+                display: flex;
+                margin-bottom: 16px;
+                align-items: flex-start;
+            `;
 
-            const conv = conversations.find(c => c.id === currentConversationId);
-            if (!conv || !conv.messages || conv.messages.length === 0) return;
+            if (msg.type === 'dialog-title') {
+                wrapper.style.cssText = 'display: flex; justify-content: center; align-items: center; gap: 12px; margin: 20px 0 12px 0;';
+                const line = document.createElement('div');
+                line.style.cssText = 'flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #3a5a7a, transparent); max-width: 200px;';
+                wrapper.appendChild(line);
+                const bubble = document.createElement('div');
+                bubble.style.cssText = 'background-color: rgba(45, 90, 123, 0.4); border: 1px solid #3a5a7a; color: #cce4f5; padding: 6px 18px; border-radius: 20px; font-size: 14px; font-weight: 700;';
+                bubble.textContent = msg.content || '（无标题）';
+                wrapper.appendChild(bubble);
+                const line2 = line.cloneNode();
+                wrapper.appendChild(line2);
+                return wrapper;
+            }
 
+            if (msg.sender.type === 'narrator') {
+                wrapper.style.justifyContent = 'center';
+                const content = document.createElement('div');
+                content.style.cssText = 'font-style: italic; color: #888; font-size: 14px; text-align: center; max-width: 80%; white-space: pre-wrap;';
+                content.innerHTML = msg.content || '';
+                wrapper.appendChild(content);
+                return wrapper;
+            } else if (msg.sender.type === 'self') {
+                wrapper.style.justifyContent = 'flex-end';
+                let selfAvatar = selfConfig.avatar;
+                if (selfAvatar && !selfAvatar.startsWith('data:')) {
+                    selfAvatar = await imageToDataURL(selfAvatar) || selfAvatar;
+                }
+                const avatar = selfAvatar || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 48 48\'%3E%3Ccircle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23666\'/%3E%3C/svg%3E';
+
+                const avatarImg = document.createElement('img');
+                avatarImg.src = avatar;
+                avatarImg.style.cssText = 'width: 48px; height: 48px; border-radius: 50%; margin-right: 12px; object-fit: cover; align-self: flex-start; flex-shrink: 0;';
+
+                const contentWrapper = document.createElement('div');
+                contentWrapper.style.cssText = 'display: flex; flex-direction: column; align-items: flex-end; max-width: 60%;';
+
+                if (msg.sender.name !== '我') {
+                    const nameEl = document.createElement('div');
+                    nameEl.style.cssText = 'font-size: 12px; color: #aaa; margin-bottom: 4px;';
+                    nameEl.textContent = msg.sender.name;
+                    contentWrapper.appendChild(nameEl);
+                }
+
+                const bubble = document.createElement('div');
+                bubble.style.cssText = 'background-color: #007ACC; padding: 10px 14px; border-radius: 12px; border-bottom-right-radius: 4px; color: #fff; line-height: 1.5; word-break: break-word; white-space: pre-wrap;';
+                bubble.innerHTML = (msg.content || '') + await renderFilesForExportAsync(msg.files);
+                contentWrapper.appendChild(bubble);
+
+                const time = document.createElement('div');
+                time.style.cssText = 'font-size: 10px; color: #888; margin-top: 4px;';
+                time.textContent = formatTime(msg.timestamp);
+                contentWrapper.appendChild(time);
+
+                wrapper.appendChild(contentWrapper);
+                wrapper.appendChild(avatarImg);
+                return wrapper;
+            } else {
+                const defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 48 48\'%3E%3Ccircle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23666\'/%3E%3C/svg%3E';
+                let avatarSrc = msg.sender.avatar;
+                if (!avatarSrc) {
+                    if (msg.sender.type === 'preset') {
+                        const origName = msg.sender.originalName || msg.sender.name;
+                        const role = presetRoles.find(r => (r.originalName || r.name) === origName);
+                        if (role && role.avatar) {
+                            avatarSrc = role.avatar;
+                        } else {
+                            const folders = {
+                                'IC玩家': ['AikesiX.png'],
+                                '游戏角色': [
+                                    'Kid.png', '兔兔.png', '冰雪散人.png', '剑客散人.png', '圣诞散人.png',
+                                    '夏日水果.png', '小刺.png', '小机器人.png', '小狼(旧).png', '小狼.png',
+                                    '小草.png', '小鞭炮.png', '幽灵Kid.png', '探险者散人.png', '散人.png',
+                                    '散娘.png', '水果猫.png', '特若.png', '猫耳散人.png', '福散.png',
+                                    '窗花散人.png', '纯色Kid.png', '纯色散人.png', '线条Kid.png', '线条散人.png',
+                                    '蜗牛小G.png', '雪花散人.png'
+                                ]
+                            };
+                            for (const [folder, files] of Object.entries(folders)) {
+                                for (const file of files) {
+                                    const fileName = file.replace(/\.[^/.]+$/, '');
+                                    if (fileName === origName) {
+                                        avatarSrc = await imageToDataURL('Character/' + folder + '/' + file) || avatarSrc;
+                                        break;
+                                    }
+                                }
+                                if (avatarSrc && avatarSrc.startsWith('data:')) break;
+                            }
+                        }
+                    } else if (msg.sender.type === 'custom') {
+                        const role = customRoles.find(r => r.id === msg.sender.id);
+                        if (role && role.avatar) avatarSrc = role.avatar;
+                    }
+                }
+                if (!avatarSrc) avatarSrc = defaultAvatar;
+                if (avatarSrc && !avatarSrc.startsWith('data:') && !avatarSrc.startsWith('http')) {
+                    const converted = await imageToDataURL(avatarSrc);
+                    avatarSrc = (converted && converted.startsWith('data:')) ? converted : defaultAvatar;
+                }
+                const avatarImg = document.createElement('img');
+                avatarImg.src = avatarSrc;
+                avatarImg.style.cssText = 'width: 48px; height: 48px; border-radius: 50%; margin-left: 12px; object-fit: cover; align-self: flex-start; flex-shrink: 0;';
+
+                const contentWrapper = document.createElement('div');
+                contentWrapper.style.cssText = 'display: flex; flex-direction: column; align-items: flex-start; max-width: 60%;';
+
+                const nameEl = document.createElement('div');
+                nameEl.style.cssText = 'font-size: 12px; color: #aaa; margin-bottom: 4px;';
+                nameEl.textContent = msg.sender.name;
+                contentWrapper.appendChild(nameEl);
+
+                const bubbleColor = msg.sender.type === 'preset' || msg.sender.type === 'custom' ? '#2D5A7B' : '#1E3A4D';
+                const bubble = document.createElement('div');
+                bubble.style.cssText = `background-color: ${bubbleColor}; padding: 10px 14px; border-radius: 12px; border-bottom-left-radius: 4px; color: #fff; line-height: 1.5; word-break: break-word; white-space: pre-wrap;`;
+                bubble.innerHTML = (msg.content || '') + await renderFilesForExportAsync(msg.files);
+                contentWrapper.appendChild(bubble);
+
+                const time = document.createElement('div');
+                time.style.cssText = 'font-size: 10px; color: #888; margin-top: 4px;';
+                time.textContent = formatTime(msg.timestamp);
+                contentWrapper.appendChild(time);
+
+                wrapper.appendChild(avatarImg);
+                wrapper.appendChild(contentWrapper);
+                return wrapper;
+            }
+        }
+
+        // 创建导出图片的完整 DOM 容器（支持单段或多段）
+        // bigTitle: 大对话标题（始终以显著样式显示）
+        // smallTitle: 小标题（仅在分段模式下显示，使用小标题样式）
+        // hasSmallTitle: 是否显示小标题
+        async function createExportContainer(messages, bigTitle, smallTitle, hasSmallTitle) {
             const is9_16 = exportAspectRatio === '9:16';
             const baseWidth = is9_16 ? 450 : 800;
             const baseHeight = is9_16 ? 800 : 450;
@@ -3167,186 +4066,145 @@
                 box-sizing: border-box;
             `;
 
-            const title = document.createElement('h2');
-            title.style.cssText = `
-                color: #fff;
-                margin-bottom: 20px;
-                font-size: 18px;
-                font-weight: bold;
-                text-align: left;
-            `;
-            title.textContent = conv.name;
-            exportDiv.appendChild(title);
+            // 大对话标题（始终以显著样式显示）
+            if (bigTitle) {
+                const bigTitleWrapper = document.createElement('div');
+                bigTitleWrapper.style.cssText = 'display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 16px;';
+                const lineLeft = document.createElement('div');
+                lineLeft.style.cssText = 'flex: 1; height: 2px; background: linear-gradient(90deg, transparent, #4a7a9a, #cce4f5, #4a7a9a, transparent); max-width: 240px;';
+                bigTitleWrapper.appendChild(lineLeft);
+                const bubble = document.createElement('div');
+                bubble.style.cssText = 'background: linear-gradient(135deg, rgba(45, 90, 123, 0.6), rgba(28, 60, 85, 0.6)); border: 1.5px solid #5a8aab; color: #fff; padding: 8px 28px; border-radius: 24px; font-size: 18px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.4);';
+                bubble.textContent = bigTitle;
+                bigTitleWrapper.appendChild(bubble);
+                const lineRight = lineLeft.cloneNode();
+                bigTitleWrapper.appendChild(lineRight);
+                exportDiv.appendChild(bigTitleWrapper);
+            }
+
+            // 小标题（仅在分段模式下显示）
+            if (hasSmallTitle && smallTitle) {
+                const smallTitleWrapper = document.createElement('div');
+                smallTitleWrapper.style.cssText = 'display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 20px;';
+                const lineLeft2 = document.createElement('div');
+                lineLeft2.style.cssText = 'flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #3a5a7a, transparent); max-width: 200px;';
+                smallTitleWrapper.appendChild(lineLeft2);
+                const bubble2 = document.createElement('div');
+                bubble2.style.cssText = 'background-color: rgba(45, 90, 123, 0.4); border: 1px solid #3a5a7a; color: #cce4f5; padding: 6px 18px; border-radius: 20px; font-size: 14px; font-weight: 700;';
+                bubble2.textContent = smallTitle;
+                smallTitleWrapper.appendChild(bubble2);
+                const lineRight2 = lineLeft2.cloneNode();
+                smallTitleWrapper.appendChild(lineRight2);
+                exportDiv.appendChild(smallTitleWrapper);
+            }
 
             const messagesContainer = document.createElement('div');
             messagesContainer.style.cssText = 'display: flex; flex-direction: column;';
 
-            for (const msg of conv.messages) {
-                const wrapper = document.createElement('div');
-                wrapper.style.cssText = `
-                    display: flex;
-                    margin-bottom: 16px;
-                    align-items: flex-start;
-                `;
-
-                if (msg.sender.type === 'narrator') {
-                    wrapper.style.justifyContent = 'center';
-                    const content = document.createElement('span');
-                    content.style.cssText = 'font-style: italic; color: #888; font-size: 14px; text-align: center; max-width: 80%;';
-                    content.textContent = msg.content;
-                    wrapper.appendChild(content);
-                } else if (msg.sender.type === 'self') {
-                    wrapper.style.justifyContent = 'flex-end';
-                    let selfAvatar = selfConfig.avatar;
-                    if (selfAvatar && !selfAvatar.startsWith('data:')) {
-                        selfAvatar = await imageToDataURL(selfAvatar) || selfAvatar;
-                    }
-                    const avatar = selfAvatar || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 48 48\'%3E%3Ccircle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23666\'/%3E%3C/svg%3E';
-
-                    const avatarImg = document.createElement('img');
-                    avatarImg.src = avatar;
-                    avatarImg.style.cssText = 'width: 48px; height: 48px; border-radius: 50%; margin-right: 12px; object-fit: cover; align-self: flex-start; flex-shrink: 0;';
-
-                    const contentWrapper = document.createElement('div');
-                    contentWrapper.style.cssText = 'display: flex; flex-direction: column; align-items: flex-end; max-width: 60%;';
-
-                    if (msg.sender.name !== '我') {
-                        const nameEl = document.createElement('div');
-                        nameEl.style.cssText = 'font-size: 12px; color: #aaa; margin-bottom: 4px;';
-                        nameEl.textContent = msg.sender.name;
-                        contentWrapper.appendChild(nameEl);
-                    }
-
-                    const bubble = document.createElement('div');
-                    bubble.style.cssText = 'background-color: #007ACC; padding: 10px 14px; border-radius: 12px; border-bottom-right-radius: 4px;';
-                    bubble.innerHTML = `<div style="color: #fff; line-height: 1.5; word-break: break-word; white-space: pre-wrap;">${msg.content || ''}</div>${await renderFilesForExportAsync(msg.files)}`;
-                    contentWrapper.appendChild(bubble);
-
-                    const time = document.createElement('div');
-                    time.style.cssText = 'font-size: 10px; color: #888; margin-top: 4px;';
-                    time.textContent = formatTime(msg.timestamp);
-                    contentWrapper.appendChild(time);
-
-                    wrapper.appendChild(contentWrapper);
-                    wrapper.appendChild(avatarImg);
-                } else {
-                    const defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' viewBox=\'0 0 48 48\'%3E%3Ccircle cx=\'24\' cy=\'24\' r=\'24\' fill=\'%23666\'/%3E%3C/svg%3E';
-                    let avatarSrc = msg.sender.avatar;
-                    if (!avatarSrc) {
-                        if (msg.sender.type === 'preset') {
-                            const role = presetRoles.find(r => r.name === msg.sender.name);
-                            if (role && role.avatar) {
-                                avatarSrc = role.avatar;
-                            } else {
-                                const folders = {
-                                    'IC玩家': ['AikesiX.png'],
-                                    '游戏角色': [
-                                        'Kid.png', '兔兔.png', '冰雪散人.png', '剑客散人.png', '圣诞散人.png',
-                                        '夏日水果.png', '小刺.png', '小机器人.png', '小狼(旧).png', '小狼.png',
-                                        '小草.png', '小鞭炮.png', '幽灵Kid.png', '探险者散人.png', '散人.png',
-                                        '散娘.png', '水果猫.png', '特若.png', '猫耳散人.png', '福散.png',
-                                        '窗花散人.png', '纯色Kid.png', '纯色散人.png', '线条Kid.png', '线条散人.png',
-                                        '蜗牛小G.png', '雪花散人.png'
-                                    ]
-                                };
-                                for (const [folder, files] of Object.entries(folders)) {
-                                    for (const file of files) {
-                                        const fileName = file.replace(/\.[^/.]+$/, '');
-                                        if (fileName === msg.sender.name) {
-                                            avatarSrc = await imageToDataURL('Character/' + folder + '/' + file) || avatarSrc;
-                                            break;
-                                        }
-                                    }
-                                    if (avatarSrc && avatarSrc.startsWith('data:')) break;
-                                }
-                            }
-                        } else if (msg.sender.type === 'custom') {
-                            const role = customRoles.find(r => r.id === msg.sender.id);
-                            if (role && role.avatar) avatarSrc = role.avatar;
-                        }
-                    }
-                    if (!avatarSrc) avatarSrc = defaultAvatar;
-                    if (avatarSrc && !avatarSrc.startsWith('data:') && !avatarSrc.startsWith('http')) {
-                        const converted = await imageToDataURL(avatarSrc);
-                        avatarSrc = (converted && converted.startsWith('data:')) ? converted : defaultAvatar;
-                    }
-                    const avatarImg = document.createElement('img');
-                    avatarImg.src = avatarSrc;
-                    avatarImg.style.cssText = 'width: 48px; height: 48px; border-radius: 50%; margin-left: 12px; object-fit: cover; align-self: flex-start; flex-shrink: 0;';
-
-                    const contentWrapper = document.createElement('div');
-                    contentWrapper.style.cssText = 'display: flex; flex-direction: column; align-items: flex-start; max-width: 60%;';
-
-                    const nameEl = document.createElement('div');
-                    nameEl.style.cssText = 'font-size: 12px; color: #aaa; margin-bottom: 4px;';
-                    nameEl.textContent = msg.sender.name;
-                    contentWrapper.appendChild(nameEl);
-
-                    const bubbleColor = msg.sender.type === 'preset' || msg.sender.type === 'custom' ? '#2D5A7B' : '#1E3A4D';
-                    const bubble = document.createElement('div');
-                    bubble.style.cssText = `background-color: ${bubbleColor}; padding: 10px 14px; border-radius: 12px; border-bottom-left-radius: 4px;`;
-                    bubble.innerHTML = `<div style="color: #fff; line-height: 1.5; word-break: break-word; white-space: pre-wrap;">${msg.content || ''}</div>${await renderFilesForExportAsync(msg.files)}`;
-                    contentWrapper.appendChild(bubble);
-
-                    const time = document.createElement('div');
-                    time.style.cssText = 'font-size: 10px; color: #888; margin-top: 4px;';
-                    time.textContent = formatTime(msg.timestamp);
-                    contentWrapper.appendChild(time);
-
-                    wrapper.appendChild(avatarImg);
-                    wrapper.appendChild(contentWrapper);
-                }
-
-                messagesContainer.appendChild(wrapper);
+            for (const msg of messages) {
+                const el = await createExportMessageElement(msg);
+                messagesContainer.appendChild(el);
             }
 
             exportDiv.appendChild(messagesContainer);
 
+            // 页脚
             const footer = document.createElement('div');
             footer.style.cssText = 'text-align: center; font-size: 12px; color: #fff; padding-top: 8px; padding-bottom: 16px; border-top: 1px solid #1a2a3a;';
             const now = new Date();
             footer.innerHTML = `
-                <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator <span style="font-size: 11px; color: #888; font-weight: normal;">版本 2026.07.14a</span></div>
-                <div style="margin-bottom: 4px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M2.7 模型</div>
+                <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator <span style="font-size: 11px; color: #888; font-weight: normal;">版本 2026.07.14b</span></div>
+                <div style="margin-bottom: 4px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M3 模型</div>
                 <div style="margin-bottom: 4px;"><a href="https://yinlishadon.github.io/IWBTCDialogGenerator/" target="_blank" style="color: #007ACC; text-decoration: none;">https://yinlishadon.github.io/IWBTCDialogGenerator/</a></div>
                 <div style="color: #888;">导出时间：${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}</div>
             `;
             exportDiv.appendChild(footer);
 
-            document.body.appendChild(exportDiv);
+            return exportDiv;
+        }
+
+        // 存储所有分段的 canvas（用于多张图同时下载）
+        let pendingCanvases = [];
+
+        async function generateExportPreview() {
+            if (!currentConversationId) return;
+
+            const conv = conversations.find(c => c.id === currentConversationId);
+            if (!conv || !conv.messages || conv.messages.length === 0) return;
+
+            pendingCanvases = [];
+            const splitByTitle = document.getElementById('exportSplitByTitle') && document.getElementById('exportSplitByTitle').checked;
+
+            // 决定要渲染的段落
+            let sections;
+            if (splitByTitle) {
+                const all = splitMessagesByTitle(conv.messages);
+                // 过滤掉空段落
+                sections = all.filter(s => s.messages.length > 0 || s.title);
+                if (sections.length === 0) sections = [{ title: null, messages: conv.messages }];
+            } else {
+                sections = [{ title: null, messages: conv.messages }];
+            }
+
+            const previewContainer = document.getElementById('exportPreviewContent');
+            previewContainer.innerHTML = '';
 
             try {
-                const canvas = await html2canvas(exportDiv, {
-                    backgroundColor: '#04151E',
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true,
-                    imageTimeout: 15000
-                });
+                for (let i = 0; i < sections.length; i++) {
+                    const section = sections[i];
+                    // 始终显示大对话标题（显著样式）
+                    // 分段模式下额外显示小标题
+                    const bigTitle = conv.name;
+                    const smallTitle = section.title || '（无标题）';
+                    const hasSmallTitle = splitByTitle && !!section.title;
+                    const exportDiv = await createExportContainer(section.messages, bigTitle, smallTitle, hasSmallTitle);
+                    document.body.appendChild(exportDiv);
+                    const canvas = await html2canvas(exportDiv, {
+                        backgroundColor: '#04151E',
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        imageTimeout: 15000
+                    });
+                    document.body.removeChild(exportDiv);
 
-                pendingCanvas = canvas;
-                document.getElementById('exportPreviewContent').innerHTML = '';
-                const img = document.createElement('img');
-                img.src = canvas.toDataURL('image/png');
-                document.getElementById('exportPreviewContent').appendChild(img);
+                    const item = {
+                        canvas: canvas,
+                        title: section.title || conv.name
+                    };
+                    pendingCanvases.push(item);
+
+                    const img = document.createElement('img');
+                    img.src = canvas.toDataURL('image/png');
+                    img.style.cssText = 'max-width: 100%; display: block; margin-bottom: 12px; border: 1px solid #1a2a3a; border-radius: 4px;';
+                    previewContainer.appendChild(img);
+                }
+                pendingCanvas = pendingCanvases.length > 0 ? pendingCanvases[0].canvas : null;
             } catch (err) {
                 console.error(err);
                 showToast('生成预览失败', 'error');
-            } finally {
-                document.body.removeChild(exportDiv);
             }
         }
 
         function confirmExportImage() {
-            if (pendingCanvas && currentConversationId) {
+            if (pendingCanvases && pendingCanvases.length > 0 && currentConversationId) {
                 const conv = conversations.find(c => c.id === currentConversationId);
                 const now = new Date();
                 const exportTime = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
-                const link = document.createElement('a');
-                link.download = `${conv.name}_${exportTime}.png`;
-                link.href = pendingCanvas.toDataURL('image/png');
-                link.click();
-                showToast('导出成功', 'success');
+                let downloadedCount = 0;
+                pendingCanvases.forEach((item, index) => {
+                    const link = document.createElement('a');
+                    const safeTitle = (item.title || `分段${index + 1}`).replace(/[\/\\:*?"<>|]/g, '_');
+                    if (pendingCanvases.length > 1) {
+                        link.download = `${conv.name}_${safeTitle}_${exportTime}.png`;
+                    } else {
+                        link.download = `${conv.name}_${exportTime}.png`;
+                    }
+                    link.href = item.canvas.toDataURL('image/png');
+                    setTimeout(() => link.click(), index * 200);
+                    downloadedCount++;
+                });
+                showToast(`已导出 ${downloadedCount} 张图片`, 'success');
                 closeExportPreview();
             } else {
                 showToast('图片正在生成中，请稍候', 'info');
@@ -3412,7 +4270,7 @@
                 font-weight: bold;
                 text-align: center;
             `;
-            title.innerHTML = conv.name + ' <span style="font-size: 12px; color: #888; font-weight: normal;">版本 2026.07.14a</span>';
+            title.innerHTML = conv.name + ' <span style="font-size: 12px; color: #888; font-weight: normal;">版本 2026.07.14b</span>';
             exportDiv.appendChild(title);
 
             const messagesContainer = document.createElement('div');
@@ -3471,7 +4329,8 @@
                     let avatarSrc = msg.sender.avatar;
                     if (!avatarSrc) {
                         if (msg.sender.type === 'preset') {
-                            const role = presetRoles.find(r => r.name === msg.sender.name);
+                            const origName = msg.sender.originalName || msg.sender.name;
+                            const role = presetRoles.find(r => (r.originalName || r.name) === origName);
                             if (role && role.avatar) {
                                 avatarSrc = role.avatar;
                             } else {
@@ -3489,7 +4348,7 @@
                                 for (const [folder, files] of Object.entries(folders)) {
                                     for (const file of files) {
                                         const fileName = file.replace(/\.[^/.]+$/, '');
-                                        if (fileName === msg.sender.name) {
+                                        if (fileName === origName) {
                                             avatarSrc = await imageToDataURL('Character/' + folder + '/' + file) || avatarSrc;
                                             break;
                                         }
@@ -3544,8 +4403,8 @@
             const now = new Date();
             const exportTimeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
             footer.innerHTML = `
-                <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator <span style="font-size: 11px; color: #888; font-weight: normal;">版本 2026.07.14a</span></div>
-                <div style="margin-bottom: 4px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M2.7 模型</div>
+                <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator <span style="font-size: 11px; color: #888; font-weight: normal;">版本 2026.07.14b</span></div>
+                <div style="margin-bottom: 4px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M3 模型</div>
                 <div style="margin-bottom: 4px;"><a href="https://yinlishadon.github.io/IWBTCDialogGenerator/" target="_blank" style="color: #007ACC; text-decoration: none;">https://yinlishadon.github.io/IWBTCDialogGenerator/</a></div>
                 <div style="color: #888;">导出时间：${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}</div>
             `;
