@@ -287,6 +287,60 @@
             align-items: flex-start;
         }
 
+        /* 加载提示 */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(4, 21, 30, 0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #1a3a4a;
+            border-top-color: #3a8ac8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 16px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .loading-progress {
+            width: 200px;
+            height: 4px;
+            background: #1a3a4a;
+            border-radius: 2px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3a8ac8, #5ba0d8);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
         .message-wrapper.self {
             flex-direction: row-reverse;
         }
@@ -437,6 +491,15 @@
 
         .sender-select {
             display: none;
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .sender-select {
+                display: none;
+            }
+            .custom-dropdown {
+                display: block;
+            }
         }
 
         .custom-dropdown {
@@ -1297,7 +1360,7 @@
 
             .sender-selector {
                 flex-wrap: nowrap;
-                overflow-x: auto;
+                overflow: visible;
             }
 
             .custom-dropdown {
@@ -1306,6 +1369,15 @@
 
             .custom-dropdown-trigger {
                 padding: 4px 8px;
+            }
+
+            .custom-dropdown-menu {
+                bottom: 100%;
+                top: auto;
+                max-height: 200px;
+                border: 2px solid #3a5a7a;
+                border-bottom: none;
+                border-radius: 4px 4px 0 0;
             }
 
             .self-config {
@@ -1404,7 +1476,15 @@
                     <button class="btn-about" onclick="showAboutModal()">ℹ️ 关于</button>
                 </div>
             </div>
-            <div class="messages-container" id="messagesContainer"></div>
+            <div class="messages-container" id="messagesContainer">
+                <div class="loading-overlay" id="loadingOverlay">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text" id="loadingText">正在加载...</div>
+                    <div class="loading-progress">
+                        <div class="loading-progress-bar" id="loadingProgressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
             <div class="input-area" id="inputArea">
                 <div class="sender-selector" style="margin-bottom: 8px;">
                     <label>发送者：</label>
@@ -1555,9 +1635,9 @@
             </div>
             <div style="text-align: center; padding: 20px;">
                 <h2 style="margin: 0 0 8px 0;">IWBTC Dialog Generator</h2>
-                <p style="color: #888; margin: 0 0 16px 0;">版本 2026.07.13c</p>
+                <p style="color: #888; margin: 0 0 16px 0;">版本 2026.07.14a</p>
                 <p style="line-height: 1.6;">《我想成为创造者》(I wanna be the Creator) 对话编辑器 (二创工具)</p>
-                <p style="line-height: 1.6;">你可以使用它来创建和编辑对话以制作IC二创内容</p>
+                <p style="line-height: 1.6;">你可以使用它来创建和编辑对话以制作IC二创内容！</p>
                 <p style="line-height: 1.6; margin-top: 8px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M2.7 模型</p>
                 <p style="line-height: 1.6; margin-top: 16px; text-align: left;">免责声明：</p>
                 <p style="line-height: 1.6; text-align: left; color: #aaa;">1. 仅供娱乐，请勿过度解读</p>
@@ -1616,13 +1696,13 @@
                 <button class="modal-close" onclick="closeModal('changelogModal')">&times;</button>
             </div>
             <div style="padding: 20px; max-height: 400px; overflow-y: auto;">
-                <h3 style="color: var(--btn-color); margin: 0 0 8px 0;">版本 2026.07.13c</h3>
+                <h3 style="color: var(--btn-color); margin: 0 0 8px 0;">版本 2026.07.14a</h3>
                 <ul style="margin: 0 0 16px 0; padding-left: 20px; line-height: 1.8;">
-                    <li>更改介绍、导出图片的名字格式，添加【使用指南】、按钮图标、快捷键操作功能、导出图片显示版本号，适配移动设备</li>
+                    <li>修复移动端无法选择发送者的BUG，添加正在加载对话提醒和进度</li>
                 </ul>
                 <h3 style="color: var(--btn-color); margin: 0 0 8px 0;">版本 2026.07.13b</h3>
                 <ul style="margin: 0 0 16px 0; padding-left: 20px; line-height: 1.8;">
-                    <li>添加【更新日志】按钮</li>
+                    <li>更改介绍、导出图片的名字格式，添加【使用指南】、【更新日志】、按钮图标、快捷键操作功能、导出图片显示版本号，适配移动设备</li>
                 </ul>
                 <h3 style="color: var(--btn-color); margin: 0 0 8px 0;">版本 2026.07.13a</h3>
                 <ul style="margin: 0 0 16px 0; padding-left: 20px; line-height: 1.8;">
@@ -1738,11 +1818,28 @@
 
         // 初始化
         document.addEventListener('DOMContentLoaded', async () => {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            const loadingProgressBar = document.getElementById('loadingProgressBar');
+
+            function setLoadingProgress(progress, text) {
+                loadingProgressBar.style.width = progress + '%';
+                if (text) loadingText.textContent = text;
+            }
+
+            loadingOverlay.classList.add('show');
+            setLoadingProgress(10, '正在加载对话...');
+
             loadConversations();
+            setLoadingProgress(30, '正在加载预设角色...');
+
             await loadPresetRoles();
+            setLoadingProgress(60, '正在渲染界面...');
+
             renderRoleManager();
             renderSenderDropdown();
             updateSelfConfig();
+            setLoadingProgress(80, '正在恢复对话...');
 
             const lastConversationId = localStorage.getItem('lastConversationId');
             if (lastConversationId && conversations.some(c => c.id === lastConversationId)) {
@@ -1750,6 +1847,11 @@
             } else if (conversations.length > 0) {
                 await selectConversation(conversations[0].id);
             }
+
+            setLoadingProgress(100, '加载完成！');
+            setTimeout(() => {
+                loadingOverlay.classList.remove('show');
+            }, 300);
         });
 
         // 加载对话
@@ -2514,8 +2616,24 @@
             onSenderChange();
         }
 
-        // 点击外部关闭下拉框
+        // 移动端touch事件支持
+        let lastTouchTime = 0;
+        const dropdownTrigger = document.querySelector('.custom-dropdown-trigger');
+        if (dropdownTrigger) {
+            dropdownTrigger.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                lastTouchTime = Date.now();
+                const dropdown = document.getElementById('senderDropdown');
+                dropdown.classList.toggle('open');
+            });
+        }
+
+        // 点击外部关闭下拉框（移动端触摸后不关闭）
         document.addEventListener('click', (e) => {
+            if (Date.now() - lastTouchTime < 500) {
+                return;
+            }
             const dropdown = document.getElementById('senderDropdown');
             if (!dropdown.contains(e.target)) {
                 dropdown.classList.remove('open');
@@ -3188,7 +3306,7 @@
             footer.style.cssText = 'text-align: center; font-size: 12px; color: #fff; padding-top: 8px; padding-bottom: 16px; border-top: 1px solid #1a2a3a;';
             const now = new Date();
             footer.innerHTML = `
-                <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator <span style="font-size: 11px; color: #888; font-weight: normal;">版本 2026.07.13c</span></div>
+                <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator <span style="font-size: 11px; color: #888; font-weight: normal;">版本 2026.07.14a</span></div>
                 <div style="margin-bottom: 4px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M2.7 模型</div>
                 <div style="margin-bottom: 4px;"><a href="https://yinlishadon.github.io/IWBTCDialogGenerator/" target="_blank" style="color: #007ACC; text-decoration: none;">https://yinlishadon.github.io/IWBTCDialogGenerator/</a></div>
                 <div style="color: #888;">导出时间：${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}</div>
@@ -3294,7 +3412,7 @@
                 font-weight: bold;
                 text-align: center;
             `;
-            title.innerHTML = conv.name + ' <span style="font-size: 12px; color: #888; font-weight: normal;">版本 2026.07.13c</span>';
+            title.innerHTML = conv.name + ' <span style="font-size: 12px; color: #888; font-weight: normal;">版本 2026.07.14a</span>';
             exportDiv.appendChild(title);
 
             const messagesContainer = document.createElement('div');
@@ -3426,7 +3544,7 @@
             const now = new Date();
             const exportTimeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
             footer.innerHTML = `
-                <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator <span style="font-size: 11px; color: #888; font-weight: normal;">版本 2026.07.13c</span></div>
+                <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator <span style="font-size: 11px; color: #888; font-weight: normal;">版本 2026.07.14a</span></div>
                 <div style="margin-bottom: 4px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M2.7 模型</div>
                 <div style="margin-bottom: 4px;"><a href="https://yinlishadon.github.io/IWBTCDialogGenerator/" target="_blank" style="color: #007ACC; text-decoration: none;">https://yinlishadon.github.io/IWBTCDialogGenerator/</a></div>
                 <div style="color: #888;">导出时间：${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}</div>
