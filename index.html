@@ -4232,8 +4232,8 @@
         }
 
         // 加载所有字体并以 @font-face 注入到页面
-        // 关键：直接使用 URL（不再转 data URL），让浏览器流式加载大文件，避免移动端 OOM
-        // 兼容 html2canvas：导出时会再次确保 document.fonts.ready
+        // 移动端优化：本地 OTF 太大经常加载失败，并行加载 Google Fonts (Noto Sans SC，即思源黑体官方 WOFF2 版本) 作为更可靠的备用
+        // CSS font-family 链中加入 'Noto Sans SC'，浏览器自动按顺序选择可用字体
         async function loadFonts() {
             const fontConfigs = [
                 { name: 'LiberationSans', path: 'Font/LiberationSans-Regular_0.ttf', format: 'truetype' },
@@ -4242,33 +4242,36 @@
 
             const loaded = [];
 
-            // 1) 先注入 @font-face（直接引用 URL，不做 base64 编码）
+            // 1) 注入本地字体的 @font-face（用相对路径，移动端 file:// 协议更稳）
             for (const cfg of fontConfigs) {
-                let fontUrl = cfg.path;
-                if (!fontUrl.startsWith('http') && !fontUrl.startsWith('file') && !fontUrl.startsWith('data:')) {
-                    fontUrl = new URL(cfg.path, window.location.href).href;
-                }
                 const style = document.createElement('style');
-                style.textContent = `@font-face { font-family: '${cfg.name}'; src: url('${fontUrl}') format('${cfg.format}'); font-weight: normal; font-style: normal; font-display: swap; }`;
+                style.textContent = `@font-face { font-family: '${cfg.name}'; src: url('${cfg.path}') format('${cfg.format}'); font-weight: normal; font-style: normal; font-display: swap; }`;
                 document.head.appendChild(style);
-                loaded.push({ name: cfg.name, success: true, url: fontUrl });
+                loaded.push({ name: cfg.name, success: true });
             }
 
-            // 2) 用 document.fonts.load 显式触发每个字体的实际下载与解码（移动端关键）
+            // 2) 并行加载思源黑体 CDN（移动端首选备用：WOFF2 变量字体，体积小、首字节快）
+            // 通过 jsDelivr 的 cn-fontsource 包提供，与本地 Source Han Sans SC 为同一字体
+            try {
+                const gLink = document.createElement('link');
+                gLink.rel = 'stylesheet';
+                gLink.href = 'https://cdn.jsdelivr.net/npm/cn-fontsource-source-han-sans-sc-vf/font.min.css';
+                document.head.appendChild(gLink);
+            } catch (e) {
+                console.warn('思源黑体 CDN 链接注入失败:', e);
+            }
+
+            // 3) 尝试触发本地字体实际加载（带 10s 兜底）
             if (document.fonts && document.fonts.load) {
-                const loadPromises = fontConfigs.map(cfg => {
+                const localPromises = fontConfigs.map(cfg => {
                     try {
-                        // 不指定文本，触发该字体的完整下载
                         return document.fonts.load(`1em "${cfg.name}"`).then(() => true).catch(() => false);
                     } catch (e) {
                         return Promise.resolve(false);
                     }
                 });
-
-                // 3) 整体 10 秒兜底（避免 document.fonts.load 永不 resolve）
                 const timeout = new Promise((resolve) => setTimeout(() => resolve('__timeout__'), 10000));
-                const results = await Promise.race([Promise.all(loadPromises), timeout]);
-
+                const results = await Promise.race([Promise.all(localPromises), timeout]);
                 if (Array.isArray(results)) {
                     results.forEach((ok, i) => {
                         if (loaded[i]) loaded[i].success = !!ok;
@@ -4278,7 +4281,7 @@
 
             const failed = loaded.filter(l => !l.success);
             if (failed.length > 0) {
-                console.warn('部分字体加载失败，将使用回退字体:', failed);
+                console.warn('本地字体加载失败，已注入 Google Fonts 备用:', failed.map(f => f.name));
             } else {
                 console.log('字体加载完成:', loaded);
             }
