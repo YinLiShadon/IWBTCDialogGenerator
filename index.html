@@ -2339,7 +2339,11 @@
 
             await loadPresetRoles();
             setLoadingProgress(50, '正在加载字体...');
-            await loadFonts();
+
+            // 字体加载内置超时，但为防万一，再加一层 18 秒总兜底，超时后继续渲染（用回退字体）
+            const fontTimeout = new Promise((resolve) => setTimeout(() => resolve('__font_init_timeout__'), 18000));
+            await Promise.race([loadFonts(), fontTimeout]);
+
             setLoadingProgress(60, '正在渲染界面...');
 
             renderRoleManager();
@@ -4181,8 +4185,20 @@
             }
         }
 
+        // 带超时的 fetch：超时后通过 AbortController 中断请求，避免字体加载卡死整个流程
+        async function fetchWithTimeout(url, timeoutMs) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const response = await fetch(url, { signal: controller.signal });
+                return response;
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
         // 将字体文件读取为 data URL（参考 imageToDataURL 的实现方式）
-        async function fontToDataURL(src) {
+        async function fontToDataURL(src, timeoutMs) {
             if (!src) return null;
             if (src.startsWith('data:')) return src;
 
@@ -4191,8 +4207,9 @@
                 fontSrc = new URL(fontSrc, window.location.href).href;
             }
 
+            const limit = timeoutMs || 8000;
             try {
-                const response = await fetch(fontSrc);
+                const response = await fetchWithTimeout(fontSrc, limit);
                 if (!response.ok) {
                     console.warn('字体 fetch 失败:', src, 'status:', response.status);
                     return null;
@@ -4214,6 +4231,7 @@
         }
 
         // 加载所有字体并以 @font-face 注入到页面（参考预设角色头像加载方式）
+        // 内置超时机制：单字体 8 秒、document.fonts.ready 最多 5 秒、整体 15 秒，避免卡死界面
         async function loadFonts() {
             const fontConfigs = [
                 { name: 'LiberationSans', path: 'Font/LiberationSans-Regular_0.ttf', format: 'truetype' },
@@ -4221,24 +4239,40 @@
             ];
 
             const loaded = [];
-            for (const cfg of fontConfigs) {
-                const dataUrl = await fontToDataURL(cfg.path);
-                if (dataUrl) {
-                    const style = document.createElement('style');
-                    style.textContent = `@font-face { font-family: '${cfg.name}'; src: url('${dataUrl}') format('${cfg.format}'); font-weight: normal; font-style: normal; font-display: swap; }`;
-                    document.head.appendChild(style);
-                    loaded.push({ name: cfg.name, success: true });
-                } else {
-                    loaded.push({ name: cfg.name, success: false });
+
+            // 整体超时（兜底，防止任何环节卡死）
+            const overallTimeout = new Promise((resolve) => setTimeout(() => resolve('__overall_timeout__'), 15000));
+            const work = (async () => {
+                for (const cfg of fontConfigs) {
+                    const dataUrl = await fontToDataURL(cfg.path, 8000);
+                    if (dataUrl) {
+                        const style = document.createElement('style');
+                        style.textContent = `@font-face { font-family: '${cfg.name}'; src: url('${dataUrl}') format('${cfg.format}'); font-weight: normal; font-style: normal; font-display: swap; }`;
+                        document.head.appendChild(style);
+                        loaded.push({ name: cfg.name, success: true });
+                    } else {
+                        loaded.push({ name: cfg.name, success: false });
+                    }
                 }
-            }
+                // 等待所有 @font-face 加载完成（带超时，最多 5 秒）
+                if (document.fonts && document.fonts.ready) {
+                    try {
+                        await Promise.race([
+                            document.fonts.ready,
+                            new Promise((resolve) => setTimeout(resolve, 5000))
+                        ]);
+                    } catch (e) { /* ignore */ }
+                }
+            })();
 
-            // 等待所有 @font-face 加载完成，确保 html2canvas 导出时字体可用
-            if (document.fonts && document.fonts.ready) {
-                try { await document.fonts.ready; } catch (e) { /* ignore */ }
-            }
+            await Promise.race([work, overallTimeout]);
 
-            console.log('字体加载完成:', loaded);
+            const failed = loaded.filter(l => !l.success);
+            if (failed.length > 0) {
+                console.warn('部分字体加载失败，将使用回退字体:', failed);
+            } else {
+                console.log('字体加载完成:', loaded);
+            }
             return loaded;
         }
 
