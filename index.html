@@ -4198,6 +4198,7 @@
         }
 
         // 将字体文件读取为 data URL（参考 imageToDataURL 的实现方式）
+        // 注：仅在需要 base64 内联（如 html2canvas CORS 兼容）时调用；正常加载请使用 loadFonts
         async function fontToDataURL(src, timeoutMs) {
             if (!src) return null;
             if (src.startsWith('data:')) return src;
@@ -4230,8 +4231,9 @@
             }
         }
 
-        // 加载所有字体并以 @font-face 注入到页面（参考预设角色头像加载方式）
-        // 内置超时机制：单字体 8 秒、document.fonts.ready 最多 5 秒、整体 15 秒，避免卡死界面
+        // 加载所有字体并以 @font-face 注入到页面
+        // 关键：直接使用 URL（不再转 data URL），让浏览器流式加载大文件，避免移动端 OOM
+        // 兼容 html2canvas：导出时会再次确保 document.fonts.ready
         async function loadFonts() {
             const fontConfigs = [
                 { name: 'LiberationSans', path: 'Font/LiberationSans-Regular_0.ttf', format: 'truetype' },
@@ -4240,32 +4242,39 @@
 
             const loaded = [];
 
-            // 整体超时（兜底，防止任何环节卡死）
-            const overallTimeout = new Promise((resolve) => setTimeout(() => resolve('__overall_timeout__'), 15000));
-            const work = (async () => {
-                for (const cfg of fontConfigs) {
-                    const dataUrl = await fontToDataURL(cfg.path, 8000);
-                    if (dataUrl) {
-                        const style = document.createElement('style');
-                        style.textContent = `@font-face { font-family: '${cfg.name}'; src: url('${dataUrl}') format('${cfg.format}'); font-weight: normal; font-style: normal; font-display: swap; }`;
-                        document.head.appendChild(style);
-                        loaded.push({ name: cfg.name, success: true });
-                    } else {
-                        loaded.push({ name: cfg.name, success: false });
-                    }
+            // 1) 先注入 @font-face（直接引用 URL，不做 base64 编码）
+            for (const cfg of fontConfigs) {
+                let fontUrl = cfg.path;
+                if (!fontUrl.startsWith('http') && !fontUrl.startsWith('file') && !fontUrl.startsWith('data:')) {
+                    fontUrl = new URL(cfg.path, window.location.href).href;
                 }
-                // 等待所有 @font-face 加载完成（带超时，最多 5 秒）
-                if (document.fonts && document.fonts.ready) {
-                    try {
-                        await Promise.race([
-                            document.fonts.ready,
-                            new Promise((resolve) => setTimeout(resolve, 5000))
-                        ]);
-                    } catch (e) { /* ignore */ }
-                }
-            })();
+                const style = document.createElement('style');
+                style.textContent = `@font-face { font-family: '${cfg.name}'; src: url('${fontUrl}') format('${cfg.format}'); font-weight: normal; font-style: normal; font-display: swap; }`;
+                document.head.appendChild(style);
+                loaded.push({ name: cfg.name, success: true, url: fontUrl });
+            }
 
-            await Promise.race([work, overallTimeout]);
+            // 2) 用 document.fonts.load 显式触发每个字体的实际下载与解码（移动端关键）
+            if (document.fonts && document.fonts.load) {
+                const loadPromises = fontConfigs.map(cfg => {
+                    try {
+                        // 不指定文本，触发该字体的完整下载
+                        return document.fonts.load(`1em "${cfg.name}"`).then(() => true).catch(() => false);
+                    } catch (e) {
+                        return Promise.resolve(false);
+                    }
+                });
+
+                // 3) 整体 10 秒兜底（避免 document.fonts.load 永不 resolve）
+                const timeout = new Promise((resolve) => setTimeout(() => resolve('__timeout__'), 10000));
+                const results = await Promise.race([Promise.all(loadPromises), timeout]);
+
+                if (Array.isArray(results)) {
+                    results.forEach((ok, i) => {
+                        if (loaded[i]) loaded[i].success = !!ok;
+                    });
+                }
+            }
 
             const failed = loaded.filter(l => !l.success);
             if (failed.length > 0) {
