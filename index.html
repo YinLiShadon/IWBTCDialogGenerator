@@ -24,7 +24,7 @@
         }
 
         body {
-            font-family: sans-serif;
+            font-family: 'LiberationSans', 'Source Han Sans SC', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             height: 100vh;
@@ -32,7 +32,7 @@
         }
 
         input, textarea, select {
-            font-family: sans-serif;
+            font-family: 'LiberationSans', 'Source Han Sans SC', sans-serif;
         }
 
         .app-container {
@@ -150,7 +150,7 @@
             cursor: pointer;
             border-radius: 4px;
             font-size: 14px;
-            font-family: sans-serif;
+            font-family: 'LiberationSans', 'Source Han Sans SC', sans-serif;
         }
 
         .export-preview-header .aspect-ratio-btn.active {
@@ -182,7 +182,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
-            font-family: sans-serif;
+            font-family: 'LiberationSans', 'Source Han Sans SC', sans-serif;
         }
 
         .export-preview-actions .btn-download {
@@ -1502,22 +1502,6 @@
             margin: 0 2px;
         }
 
-        .text-format-toolbar .color-picker-wrapper {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .text-format-toolbar input[type="color"] {
-            width: 32px;
-            height: 28px;
-            padding: 2px;
-            border: 1px solid #3a5a7a;
-            border-radius: 4px;
-            background-color: var(--input-bg);
-            cursor: pointer;
-        }
-
         /* 马赛克效果 */
         .mosaic-text {
             display: inline-block;
@@ -1606,23 +1590,171 @@
             cursor: pointer;
         }
 
-        /* 颜色选择面板 */
-        .color-presets {
-            display: inline-flex;
-            gap: 2px;
-            margin-left: 4px;
+        /* 颜色选择器弹窗 */
+        .color-picker-panel {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 6px;
+            margin: 12px 0 16px 0;
         }
 
-        .color-preset {
-            width: 20px;
-            height: 20px;
-            border-radius: 3px;
+        .color-picker-panel .color-swatch {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 4px;
             cursor: pointer;
-            border: 1px solid #444;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: transform 0.15s, box-shadow 0.15s;
         }
 
-        .color-preset:hover {
-            transform: scale(1.1);
+        .color-picker-panel .color-swatch:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+        }
+
+        .color-picker-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .color-picker-input-row input[type="text"] {
+            flex: 1;
+            padding: 6px 10px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid #3a5a7a;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .color-picker-section-title {
+            color: var(--btn-color);
+            font-size: 13px;
+            margin: 8px 0 4px 0;
+        }
+
+        .color-picker-rgb-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin: 8px 0 4px 0;
+        }
+
+        .color-picker-rgb-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--input-bg);
+            border: 1px solid #3a5a7a;
+            border-radius: 4px;
+            padding: 4px 8px;
+        }
+
+        .color-picker-rgb-item label {
+            font-weight: 700;
+            font-size: 12px;
+            min-width: 14px;
+            text-align: center;
+        }
+
+        .color-picker-rgb-item.r label { color: #ff6b6b; }
+        .color-picker-rgb-item.g label { color: #69db7c; }
+        .color-picker-rgb-item.b label { color: #4dabf7; }
+
+        .color-picker-rgb-item input[type="number"] {
+            flex: 1;
+            width: 100%;
+            padding: 4px 2px;
+            background-color: transparent;
+            color: var(--text-color);
+            border: none;
+            outline: none;
+            font-family: inherit;
+            -moz-appearance: textfield;
+        }
+
+        .color-picker-rgb-item input[type="number"]::-webkit-outer-spin-button,
+        .color-picker-rgb-item input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .color-picker-preview {
+            width: 100%;
+            height: 28px;
+            border-radius: 4px;
+            border: 1px solid #3a5a7a;
+            margin: 8px 0 4px 0;
+            background-color: #FFFFFF;
+        }
+
+        /* 颜色自由选择面板：SV 色域方块 + 色相滑条 */
+        .color-picker-sv-area {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            background-color: #FF0000;
+            border-radius: 4px;
+            cursor: crosshair;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+            margin-bottom: 8px;
+        }
+
+        .color-picker-sv-white {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to right, #FFFFFF, rgba(255,255,255,0));
+        }
+
+        .color-picker-sv-black {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to top, #000000, rgba(0,0,0,0));
+        }
+
+        .color-picker-sv-cursor {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(0,0,0,0.2);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            left: 0;
+            top: 0;
+        }
+
+        .color-picker-hue-track {
+            position: relative;
+            width: 100%;
+            height: 14px;
+            margin: 8px 0 4px 0;
+            background: linear-gradient(to right, #FF0000 0%, #FFFF00 16.67%, #00FF00 33.33%, #00FFFF 50%, #0000FF 66.67%, #FF00FF 83.33%, #FF0000 100%);
+            border-radius: 7px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        .color-picker-hue-cursor {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(0,0,0,0.2);
+            transform: translate(-50%, -50%);
+            top: 7px;
+            left: 0;
+            pointer-events: none;
         }
 
         /* 角色管理 - 预设角色重命名按钮 */
@@ -1736,10 +1868,7 @@
                     <button class="format-btn" data-format="underline" onclick="toggleTextFormat('underline')" title="下划线"><u>U</u></button>
                     <button class="format-btn" data-format="strikethrough" onclick="toggleTextFormat('strikethrough')" title="删除线"><s>S</s></button>
                     <span class="format-divider"></span>
-                    <span class="color-picker-wrapper">
-                        <input type="color" id="textColorPicker" value="#ffffff" onchange="applyTextColor(this.value)" title="文字颜色">
-                    </span>
-                    <span class="color-presets" id="colorPresets"></span>
+                    <button class="format-btn" onclick="showColorPickerModal()" title="文字颜色" style="min-width:auto; padding: 4px 8px;">🎨</button>
                     <span class="format-divider"></span>
                     <button class="format-btn" data-format="mosaic" onclick="toggleTextFormat('mosaic')" title="马赛克">▓</button>
                     <button class="format-btn" data-format="reset" onclick="resetTextFormat()" title="清除格式">🧹</button>
@@ -1873,7 +2002,7 @@
             </div>
             <div style="text-align: center; padding: 20px;">
                 <h2 style="margin: 0 0 8px 0;">IWBTC Dialog Generator</h2>
-                <p style="color: #888; margin: 0 0 16px 0;">版本 2026.07.14b</p>
+                <p style="color: #888; margin: 0 0 16px 0;">版本 2026.07.15a</p>
                 <p style="line-height: 1.6;">《我想成为创造者》(I wanna be the Creator) 对话编辑器 (二创工具)</p>
                 <p style="line-height: 1.6;">你可以使用它来创建和编辑对话以制作IC二创内容！</p>
                 <p style="line-height: 1.6; margin-top: 8px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M3 模型</p>
@@ -1909,7 +2038,7 @@
                     <li><strong>角色管理：</strong>可添加、编辑、删除自定义角色；可重命名预设角色（仅显示名）</li>
                     <li><strong>重命名对话：</strong>点击顶部对话名称可直接修改</li>
                     <li><strong>小对话标题：</strong>点击工具栏"插入标题"可添加分割标题，导出图片时可按此分割</li>
-                    <li><strong>文字格式：</strong>输入框上方工具栏：选中文本后点击 <b>B</b>（粗）/ <i>I</i>（斜）/ <u>U</u>（下划线）/ <s>S</s>（删除线）/ 调色板（颜色）/ ▓（马赛克）/ 🧹（清除）</li>
+                    <li><strong>文字格式：</strong>输入框上方工具栏：选中文本后点击 <b>B</b>（粗）/ <i>I</i>（斜）/ <u>U</u>（下划线）/ <s>S</s>（删除线）/ 🎨（颜色选择）/ ▓（马赛克）/ 🧹（清除）</li>
                 </ul>
                 <h3 style="color: var(--btn-color); margin: 0 0 12px 0;">快捷操作</h3>
                 <ul style="margin: 0 0 20px 0; padding-left: 20px; line-height: 1.8;">
@@ -1937,6 +2066,10 @@
                 <button class="modal-close" onclick="closeModal('changelogModal')">&times;</button>
             </div>
             <div style="padding: 20px; max-height: 400px; overflow-y: auto;">
+                <h3 style="color: var(--btn-color); margin: 0 0 8px 0;">版本 2026.07.15a</h3>
+                <ul style="margin: 0 0 16px 0; padding-left: 20px; line-height: 1.8;">
+                    <li>添加新字体加载方式、新颜色选择面板</li>
+                </ul>
                 <h3 style="color: var(--btn-color); margin: 0 0 8px 0;">版本 2026.07.14b</h3>
                 <ul style="margin: 0 0 16px 0; padding-left: 20px; line-height: 1.8;">
                     <li>更新【简介】【使用指南】、顶部标题样式</li>
@@ -2058,6 +2191,51 @@
         </div>
     </div>
 
+    <!-- 颜色选择器模态框 -->
+    <div class="modal" id="colorPickerModal">
+        <div class="modal-content" style="max-width: 440px;">
+            <div class="modal-header">
+                <span class="modal-title">🎨 颜色选择</span>
+                <button class="modal-close" onclick="closeColorPickerModal()">&times;</button>
+            </div>
+            <div style="padding: 4px 4px 0 4px;">
+                <div class="color-picker-section-title">颜色自由选择</div>
+                <div class="color-picker-sv-area" id="colorPickerSVArea">
+                    <div class="color-picker-sv-white"></div>
+                    <div class="color-picker-sv-black"></div>
+                    <div class="color-picker-sv-cursor" id="colorPickerSVCursor"></div>
+                </div>
+                <div class="color-picker-hue-track" id="colorPickerHueTrack">
+                    <div class="color-picker-hue-cursor" id="colorPickerHueCursor"></div>
+                </div>
+                <div class="color-picker-rgb-row">
+                    <div class="color-picker-rgb-item r">
+                        <label>R</label>
+                        <input type="number" id="colorPickerR" min="0" max="255" step="1" value="255" oninput="onColorRgbInput()">
+                    </div>
+                    <div class="color-picker-rgb-item g">
+                        <label>G</label>
+                        <input type="number" id="colorPickerG" min="0" max="255" step="1" value="255" oninput="onColorRgbInput()">
+                    </div>
+                    <div class="color-picker-rgb-item b">
+                        <label>B</label>
+                        <input type="number" id="colorPickerB" min="0" max="255" step="1" value="255" oninput="onColorRgbInput()">
+                    </div>
+                </div>
+                <div class="color-picker-input-row">
+                    <input type="text" id="colorPickerHex" placeholder="如 #FF6B6B" maxlength="7" oninput="onColorHexInput(this.value)">
+                </div>
+                <div class="color-picker-preview" id="colorPickerPreview"></div>
+                <div class="color-picker-section-title">基础色</div>
+                <div class="color-picker-panel" id="colorPickerBasic"></div>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button class="btn-create-role" onclick="closeColorPickerModal()" style="flex:1; background-color: #555;">✕ 取消</button>
+                <button class="btn-create-role" onclick="confirmColorPicker()" style="flex:1;">✔️ 应用</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script>
         // 数据结构
@@ -2084,8 +2262,8 @@
             color: null
         };
 
-        // 预设颜色
-        const presetColors = ['#FFFFFF', '#FF6B6B', '#FFA94D', '#FFD43B', '#69DB7C', '#4DABF7', '#9775FA', '#F783AC'];
+        // 预设基础色（赤 棕 橙 黄 绿 青 蓝 紫 粉 白 灰 黑）— 使用真正的颜色
+        const presetColors = ['#FF0000', '#8B4513', '#FFA500', '#FFFF00', '#008000', '#00CED1', '#0000FF', '#800080', '#FF69B4', '#FFFFFF', '#808080', '#000000'];
 
         // Toast 提示
         function showToast(message, type = 'info') {
@@ -2159,8 +2337,9 @@
             loadConversations();
             setLoadingProgress(30, '正在加载预设角色...');
 
-            initColorPresets();
             await loadPresetRoles();
+            setLoadingProgress(50, '正在加载字体...');
+            await loadFonts();
             setLoadingProgress(60, '正在渲染界面...');
 
             renderRoleManager();
@@ -3507,19 +3686,250 @@
             input.setSelectionRange(start + openTag.length, end + openTag.length);
         }
 
-        // 初始化颜色预设按钮
-        function initColorPresets() {
-            const container = document.getElementById('colorPresets');
-            if (!container) return;
-            container.innerHTML = '';
-            presetColors.forEach(color => {
-                const span = document.createElement('span');
-                span.className = 'color-preset';
-                span.style.backgroundColor = color;
-                span.title = color;
-                span.onclick = () => applyTextColor(color);
-                container.appendChild(span);
+        // 当前选中的颜色（颜色选择器弹窗用）
+        let currentPickerColor = '#FFFFFF';
+
+        // 当前 HSV 状态（用于自由选择面板的拖拽）
+        let currentHue = 0;       // 0-360
+        let currentSat = 0;       // 0-100
+        let currentVal = 100;     // 0-100
+        let pickerEventsBound = false;
+        let svDragging = false;    // SV 域拖动标志
+        let hueDragging = false;   // 色相滑条拖动标志
+
+        // RGB <-> HSV 转换
+        function rgbToHsv(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const d = max - min;
+            let h = 0;
+            if (d !== 0) {
+                if (max === r) h = ((g - b) / d) % 6;
+                else if (max === g) h = (b - r) / d + 2;
+                else h = (r - g) / d + 4;
+                h *= 60;
+                if (h < 0) h += 360;
+            }
+            const s = max === 0 ? 0 : (d / max) * 100;
+            const v = max * 100;
+            return { h: Math.round(h), s: Math.round(s), v: Math.round(v) };
+        }
+
+        function hsvToRgb(h, s, v) {
+            s /= 100; v /= 100;
+            const c = v * s;
+            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            const m = v - c;
+            let r = 0, g = 0, b = 0;
+            if (h < 60) { r = c; g = x; }
+            else if (h < 120) { r = x; g = c; }
+            else if (h < 180) { g = c; b = x; }
+            else if (h < 240) { g = x; b = c; }
+            else if (h < 300) { r = x; b = c; }
+            else { r = c; b = x; }
+            return {
+                r: Math.round((r + m) * 255),
+                g: Math.round((g + m) * 255),
+                b: Math.round((b + m) * 255)
+            };
+        }
+
+        // 将 hex 同步到所有 UI 控件（hex 输入、RGB、预览、SV 域、hue 滑条）
+        function syncPickerColor(hex) {
+            const upper = (hex || '').toUpperCase();
+            if (!/^#[0-9A-F]{6}$/.test(upper)) return;
+            currentPickerColor = upper;
+            const hexInput = document.getElementById('colorPickerHex');
+            if (hexInput && hexInput.value.toUpperCase() !== upper) hexInput.value = upper;
+            const r = parseInt(upper.slice(1, 3), 16);
+            const g = parseInt(upper.slice(3, 5), 16);
+            const b = parseInt(upper.slice(5, 7), 16);
+            const rInput = document.getElementById('colorPickerR');
+            const gInput = document.getElementById('colorPickerG');
+            const bInput = document.getElementById('colorPickerB');
+            if (rInput && Number(rInput.value) !== r) rInput.value = r;
+            if (gInput && Number(gInput.value) !== g) gInput.value = g;
+            if (bInput && Number(bInput.value) !== b) bInput.value = b;
+            const preview = document.getElementById('colorPickerPreview');
+            if (preview) preview.style.backgroundColor = upper;
+            // 同步 HSV 状态
+            const hsv = rgbToHsv(r, g, b);
+            currentHue = hsv.h; currentSat = hsv.s; currentVal = hsv.v;
+            updateSvAreaVisuals();
+            updateHueCursor();
+        }
+
+        // 根据当前 HSV 更新 SV 方块背景与游标位置
+        function updateSvAreaVisuals() {
+            const svArea = document.getElementById('colorPickerSVArea');
+            const cursor = document.getElementById('colorPickerSVCursor');
+            if (!svArea || !cursor) return;
+            // 背景设为当前 hue 的纯色，白/黑渐变叠加形成 SV 域
+            const hueColor = hsvToHex(currentHue, 100, 100);
+            svArea.style.backgroundColor = hueColor;
+            // 游标位置：x = 饱和度，y = 1 - 亮度
+            const sat = Math.max(0, Math.min(100, currentSat));
+            const val = Math.max(0, Math.min(100, currentVal));
+            const rect = svArea.getBoundingClientRect();
+            const x = (sat / 100) * rect.width;
+            const y = (1 - val / 100) * rect.height;
+            cursor.style.left = x + 'px';
+            cursor.style.top = y + 'px';
+        }
+
+        function updateHueCursor() {
+            const track = document.getElementById('colorPickerHueTrack');
+            const cursor = document.getElementById('colorPickerHueCursor');
+            if (!track || !cursor) return;
+            const rect = track.getBoundingClientRect();
+            const x = (currentHue / 360) * rect.width;
+            cursor.style.left = x + 'px';
+        }
+
+        function hsvToHex(h, s, v) {
+            const { r, g, b } = hsvToRgb(h, s, v);
+            return '#' + toHex2(r) + toHex2(g) + toHex2(b);
+        }
+
+        // 绑定 SV 域 + hue 滑条鼠标事件（首次打开时执行）
+        // pointerdown 绑在控件自身，pointermove / pointerup 绑在 document，标志位控制是否更新颜色
+        function bindPickerEvents() {
+            if (pickerEventsBound) return;
+            pickerEventsBound = true;
+
+            const svArea = document.getElementById('colorPickerSVArea');
+            const hueTrack = document.getElementById('colorPickerHueTrack');
+
+            // SV 域
+            const onSvPointer = (e) => {
+                if (!svArea) return;
+                const rect = svArea.getBoundingClientRect();
+                const clientX = e.clientX;
+                const clientY = e.clientY;
+                let x = clientX - rect.left;
+                let y = clientY - rect.top;
+                if (x < 0) x = 0; if (x > rect.width) x = rect.width;
+                if (y < 0) y = 0; if (y > rect.height) y = rect.height;
+                currentSat = Math.round((x / rect.width) * 100);
+                currentVal = Math.round((1 - y / rect.height) * 100);
+                const hex = hsvToHex(currentHue, currentSat, currentVal);
+                syncPickerColor(hex);
+            };
+
+            const onSvPointerDown = (e) => {
+                if (!svArea) return;
+                svDragging = true;
+                e.preventDefault();
+                onSvPointer(e);
+            };
+
+            // Hue 滑条
+            const onHuePointer = (e) => {
+                if (!hueTrack) return;
+                const rect = hueTrack.getBoundingClientRect();
+                const clientX = e.clientX;
+                let x = clientX - rect.left;
+                if (x < 0) x = 0; if (x > rect.width) x = rect.width;
+                currentHue = Math.round((x / rect.width) * 360);
+                const hex = hsvToHex(currentHue, currentSat, currentVal);
+                syncPickerColor(hex);
+            };
+
+            const onHuePointerDown = (e) => {
+                if (!hueTrack) return;
+                hueDragging = true;
+                e.preventDefault();
+                onHuePointer(e);
+            };
+
+            // 统一的 document 级移动 / 抬起处理
+            const onDocMove = (e) => {
+                if (svDragging) onSvPointer(e);
+                if (hueDragging) onHuePointer(e);
+            };
+            const onDocUp = () => {
+                svDragging = false;
+                hueDragging = false;
+            };
+
+            if (svArea) svArea.addEventListener('pointerdown', onSvPointerDown);
+            if (hueTrack) hueTrack.addEventListener('pointerdown', onHuePointerDown);
+            document.addEventListener('pointermove', onDocMove);
+            document.addEventListener('pointerup', onDocUp);
+            document.addEventListener('pointercancel', onDocUp);
+        }
+
+        // 打开颜色选择器弹窗
+        function showColorPickerModal() {
+            const modal = document.getElementById('colorPickerModal');
+            if (!modal) return;
+            bindPickerEvents();
+            // 填充基础色（12 色）
+            const basicPanel = document.getElementById('colorPickerBasic');
+            if (basicPanel) {
+                basicPanel.innerHTML = '';
+                presetColors.forEach(color => {
+                    basicPanel.appendChild(createColorSwatch(color));
+                });
+            }
+            // 先显示 modal，再下一帧同步颜色（确保 getBoundingClientRect 返回正确尺寸，游标才能正确定位并响应拖动）
+            modal.classList.add('active');
+            requestAnimationFrame(() => {
+                syncPickerColor('#FFFFFF');
             });
+        }
+
+        // 关闭颜色选择器弹窗
+        function closeColorPickerModal() {
+            const modal = document.getElementById('colorPickerModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        // 创建单个色块元素
+        function createColorSwatch(color) {
+            const sw = document.createElement('div');
+            sw.className = 'color-swatch';
+            sw.style.backgroundColor = color;
+            sw.title = color;
+            sw.onclick = () => syncPickerColor(color);
+            return sw;
+        }
+
+        // 十六进制输入框变化
+        function onColorHexInput(value) {
+            const trimmed = (value || '').trim();
+            const hex = trimmed.startsWith('#') ? trimmed : '#' + trimmed;
+            if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+                syncPickerColor(hex);
+            }
+        }
+
+        // RGB 输入框变化
+        function onColorRgbInput() {
+            const r = clampInt(document.getElementById('colorPickerR').value, 0, 255);
+            const g = clampInt(document.getElementById('colorPickerG').value, 0, 255);
+            const b = clampInt(document.getElementById('colorPickerB').value, 0, 255);
+            const hex = '#' + toHex2(r) + toHex2(g) + toHex2(b);
+            syncPickerColor(hex);
+        }
+
+        function clampInt(val, min, max) {
+            let n = parseInt(val, 10);
+            if (isNaN(n)) n = min;
+            if (n < min) n = min;
+            if (n > max) n = max;
+            return n;
+        }
+
+        function toHex2(n) {
+            return n.toString(16).padStart(2, '0').toUpperCase();
+        }
+
+        // 确认应用颜色
+        function confirmColorPicker() {
+            applyTextColor(currentPickerColor);
+            closeColorPickerModal();
         }
 
         // 打开插入小对话标题模态框
@@ -3771,6 +4181,67 @@
             }
         }
 
+        // 将字体文件读取为 data URL（参考 imageToDataURL 的实现方式）
+        async function fontToDataURL(src) {
+            if (!src) return null;
+            if (src.startsWith('data:')) return src;
+
+            let fontSrc = src;
+            if (!fontSrc.startsWith('http') && !fontSrc.startsWith('file') && !fontSrc.startsWith('data:')) {
+                fontSrc = new URL(fontSrc, window.location.href).href;
+            }
+
+            try {
+                const response = await fetch(fontSrc);
+                if (!response.ok) {
+                    console.warn('字体 fetch 失败:', src, 'status:', response.status);
+                    return null;
+                }
+                const blob = await response.blob();
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = () => {
+                        console.warn('字体 FileReader 失败:', src);
+                        resolve(null);
+                    };
+                    reader.readAsDataURL(blob);
+                });
+            } catch (e) {
+                console.warn('字体加载失败:', src, e);
+                return null;
+            }
+        }
+
+        // 加载所有字体并以 @font-face 注入到页面（参考预设角色头像加载方式）
+        async function loadFonts() {
+            const fontConfigs = [
+                { name: 'LiberationSans', path: 'Font/LiberationSans-Regular_0.ttf', format: 'truetype' },
+                { name: 'Source Han Sans SC', path: 'Font/SourceHanSansSC-Regular_0.otf', format: 'opentype' }
+            ];
+
+            const loaded = [];
+            for (const cfg of fontConfigs) {
+                const dataUrl = await fontToDataURL(cfg.path);
+                if (dataUrl) {
+                    const style = document.createElement('style');
+                    style.textContent = `@font-face { font-family: '${cfg.name}'; src: url('${dataUrl}') format('${cfg.format}'); font-weight: normal; font-style: normal; font-display: swap; }`;
+                    document.head.appendChild(style);
+                    loaded.push({ name: cfg.name, success: true });
+                } else {
+                    loaded.push({ name: cfg.name, success: false });
+                }
+            }
+
+            // 等待所有 @font-face 加载完成，确保 html2canvas 导出时字体可用
+            if (document.fonts && document.fonts.ready) {
+                try { await document.fonts.ready; } catch (e) { /* ignore */ }
+            }
+
+            console.log('字体加载完成:', loaded);
+            return loaded;
+        }
+
         function isMobileDevice() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
         }
@@ -3984,7 +4455,7 @@
                 min-height: ${baseHeight}px;
                 background-color: #04151E;
                 padding: 20px;
-                font-family: sans-serif;
+                font-family: 'LiberationSans', 'Source Han Sans SC', sans-serif;
                 box-sizing: border-box;
             `;
 
@@ -4035,7 +4506,7 @@
             footer.style.cssText = 'text-align: center; font-size: 12px; color: #fff; padding-top: 8px; padding-bottom: 16px; border-top: 1px solid #1a2a3a;';
             const now = new Date();
             footer.innerHTML = `
-                <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator <span style="font-size: 11px; color: #888; font-weight: normal;">版本 2026.07.14b</span></div>
+                <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator <span style="font-size: 11px; color: #888; font-weight: normal;">版本 2026.07.15a</span></div>
                 <div style="margin-bottom: 4px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M3 模型</div>
                 <div style="margin-bottom: 4px;"><a href="https://yinlishadon.github.io/IWBTCDialogGenerator/" target="_blank" style="color: #007ACC; text-decoration: none;">https://yinlishadon.github.io/IWBTCDialogGenerator/</a></div>
                 <div style="color: #888;">导出时间：${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}</div>
@@ -4180,7 +4651,7 @@
                 min-height: ${baseHeight}px;
                 background-color: #04151E;
                 padding: 30px;
-                font-family: sans-serif;
+                font-family: 'LiberationSans', 'Source Han Sans SC', sans-serif;
                 box-sizing: border-box;
             `;
 
@@ -4192,7 +4663,7 @@
                 font-weight: bold;
                 text-align: center;
             `;
-            title.innerHTML = conv.name + ' <span style="font-size: 12px; color: #888; font-weight: normal;">版本 2026.07.14b</span>';
+            title.innerHTML = conv.name + ' <span style="font-size: 12px; color: #888; font-weight: normal;">版本 2026.07.15a</span>';
             exportDiv.appendChild(title);
 
             const messagesContainer = document.createElement('div');
@@ -4325,7 +4796,7 @@
             const now = new Date();
             const exportTimeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
             footer.innerHTML = `
-                <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator <span style="font-size: 11px; color: #888; font-weight: normal;">版本 2026.07.14b</span></div>
+                <div style="margin-bottom: 4px; font-weight: bold; font-size: 16px;">IWBTC Dialog Generator <span style="font-size: 11px; color: #888; font-weight: normal;">版本 2026.07.15a</span></div>
                 <div style="margin-bottom: 4px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M3 模型</div>
                 <div style="margin-bottom: 4px;"><a href="https://yinlishadon.github.io/IWBTCDialogGenerator/" target="_blank" style="color: #007ACC; text-decoration: none;">https://yinlishadon.github.io/IWBTCDialogGenerator/</a></div>
                 <div style="color: #888;">导出时间：${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}</div>
