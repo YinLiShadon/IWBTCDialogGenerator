@@ -4185,103 +4185,46 @@
             }
         }
 
-        // 带超时的 fetch：超时后通过 AbortController 中断请求，避免字体加载卡死整个流程
-        async function fetchWithTimeout(url, timeoutMs) {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), timeoutMs);
-            try {
-                const response = await fetch(url, { signal: controller.signal });
-                return response;
-            } finally {
-                clearTimeout(timer);
-            }
-        }
-
-        // 将字体文件读取为 data URL（参考 imageToDataURL 的实现方式）
-        // 注：仅在需要 base64 内联（如 html2canvas CORS 兼容）时调用；正常加载请使用 loadFonts
-        async function fontToDataURL(src, timeoutMs) {
-            if (!src) return null;
-            if (src.startsWith('data:')) return src;
-
-            let fontSrc = src;
-            if (!fontSrc.startsWith('http') && !fontSrc.startsWith('file') && !fontSrc.startsWith('data:')) {
-                fontSrc = new URL(fontSrc, window.location.href).href;
-            }
-
-            const limit = timeoutMs || 8000;
-            try {
-                const response = await fetchWithTimeout(fontSrc, limit);
-                if (!response.ok) {
-                    console.warn('字体 fetch 失败:', src, 'status:', response.status);
-                    return null;
-                }
-                const blob = await response.blob();
-                return new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = () => {
-                        console.warn('字体 FileReader 失败:', src);
-                        resolve(null);
-                    };
-                    reader.readAsDataURL(blob);
-                });
-            } catch (e) {
-                console.warn('字体加载失败:', src, e);
-                return null;
-            }
-        }
-
-        // 加载所有字体并以 @font-face 注入到页面
-        // 移动端优化：本地 OTF 太大经常加载失败，并行加载 Google Fonts (Noto Sans SC，即思源黑体官方 WOFF2 版本) 作为更可靠的备用
-        // CSS font-family 链中加入 'Noto Sans SC'，浏览器自动按顺序选择可用字体
+        // 加载字体：
+        // - Liberation Sans：本地 TTF，主字体（拉丁字母/数字）
+        // - 思源黑体：jsDelivr cn-fontsource CDN WOFF2 变量字体，中文备用，移动端友好
         async function loadFonts() {
-            const fontConfigs = [
-                { name: 'LiberationSans', path: 'Font/LiberationSans-Regular_0.ttf', format: 'truetype' },
-                { name: 'Source Han Sans SC', path: 'Font/SourceHanSansSC-Regular_0.otf', format: 'opentype' }
-            ];
-
             const loaded = [];
 
-            // 1) 注入本地字体的 @font-face（用相对路径，移动端 file:// 协议更稳）
-            for (const cfg of fontConfigs) {
+            // 1) 本地 Liberation Sans：通过 @font-face 直接使用相对路径，移动端 file:// 协议更稳
+            try {
                 const style = document.createElement('style');
-                style.textContent = `@font-face { font-family: '${cfg.name}'; src: url('${cfg.path}') format('${cfg.format}'); font-weight: normal; font-style: normal; font-display: swap; }`;
+                style.textContent = `@font-face { font-family: 'LiberationSans'; src: url('Font/LiberationSans-Regular_0.ttf') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }`;
                 document.head.appendChild(style);
-                loaded.push({ name: cfg.name, success: true });
+                loaded.push({ name: 'LiberationSans', success: true });
+            } catch (e) {
+                console.warn('LiberationSans @font-face 注入失败:', e);
+                loaded.push({ name: 'LiberationSans', success: false });
             }
 
-            // 2) 并行加载思源黑体 CDN（移动端首选备用：WOFF2 变量字体，体积小、首字节快）
-            // 通过 jsDelivr 的 cn-fontsource 包提供，与本地 Source Han Sans SC 为同一字体
+            // 2) 思源黑体 CDN（WOFF2 变量字体，移动端首选）
             try {
                 const gLink = document.createElement('link');
                 gLink.rel = 'stylesheet';
                 gLink.href = 'https://cdn.jsdelivr.net/npm/cn-fontsource-source-han-sans-sc-vf/font.min.css';
                 document.head.appendChild(gLink);
+                loaded.push({ name: 'Source Han Sans SC', success: true });
             } catch (e) {
                 console.warn('思源黑体 CDN 链接注入失败:', e);
+                loaded.push({ name: 'Source Han Sans SC', success: false });
             }
 
-            // 3) 尝试触发本地字体实际加载（带 10s 兜底）
-            if (document.fonts && document.fonts.load) {
-                const localPromises = fontConfigs.map(cfg => {
-                    try {
-                        return document.fonts.load(`1em "${cfg.name}"`).then(() => true).catch(() => false);
-                    } catch (e) {
-                        return Promise.resolve(false);
-                    }
-                });
-                const timeout = new Promise((resolve) => setTimeout(() => resolve('__timeout__'), 10000));
-                const results = await Promise.race([Promise.all(localPromises), timeout]);
-                if (Array.isArray(results)) {
-                    results.forEach((ok, i) => {
-                        if (loaded[i]) loaded[i].success = !!ok;
-                    });
-                }
+            // 3) 兜底等待 document.fonts.ready（最多 8 秒），不阻塞初始化
+            if (document.fonts && document.fonts.ready) {
+                const timeout = new Promise((resolve) => setTimeout(() => resolve('__timeout__'), 8000));
+                try {
+                    await Promise.race([document.fonts.ready, timeout]);
+                } catch (e) { /* ignore */ }
             }
 
             const failed = loaded.filter(l => !l.success);
             if (failed.length > 0) {
-                console.warn('本地字体加载失败，已注入 Google Fonts 备用:', failed.map(f => f.name));
+                console.warn('字体加载失败:', failed.map(f => f.name));
             } else {
                 console.log('字体加载完成:', loaded);
             }
