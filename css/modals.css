@@ -1,0 +1,236 @@
+/* 通用 modal 样式 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: var(--sidebar-bg);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* 裁剪/分割导出选项 */
+.export-section-option {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    color: #ccc;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 4px;
+}
+
+.export-section-option:hover {
+    background-color: rgba(255,255,255,0.05);
+}
+
+.export-section-option input[type="checkbox"] {
+    cursor: pointer;
+}
+
+/* 表单 */
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    color: #aaa;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid #1a2a3a;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-family: inherit;
+}
+
+.avatar-upload {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar-upload img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-upload input[type="file"] {
+    display: none;
+}
+
+.btn-upload-avatar {
+    background-color: var(--btn-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.btn-create-role {
+    background-color: var(--btn-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.btn-create-role:hover {
+    background-color: #0098e6;
+}
+
+.btn-new-chat {
+    background-color: #4a90d9;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.btn-new-chat:hover {
+    background-color: #3a7fc8;
+}
+
+/* 头衔颜色按钮（在编辑模态框中） */
+.btn-title-color {
+    width: 36px;
+    height: 36px;
+    border: 2px solid #3a5a7a;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.btn-title-color:hover {
+    border-color: var(--btn-color);
+}
+
+/* 头衔输入行 */
+.title-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.title-input-row input[type="text"] {
+    flex: 1;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid #1a2a3a;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-family: inherit;
+}
+
+/* 关于弹窗 */
+.modal-content.about-content p {
+    line-height: 1.6;
+}
+
+.about-content h2 {
+    margin: 0 0 8px 0;
+}
+
+.about-content h3 {
+    color: var(--btn-color);
+    margin: 0 0 8px 0;
+}
+
+.about-content a {
+    color: var(--btn-color);
+}
+
+.about-content .disclaimer-section {
+    text-align: left;
+    color: #aaa;
+}
+
+.about-content .version-line {
+    color: #888;
+    margin: 0 0 16px 0;
+}
+
+.about-content .repo-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background: var(--btn-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    margin-top: 16px;
+}
+
+/* 更新日志 / 引导 */
+.changelog-content,
+.guide-content {
+    padding: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.changelog-content h3,
+.guide-content h3 {
+    color: var(--btn-color);
+}
+
+.changelog-content ul,
+.guide-content ul {
+    margin: 0 0 16px 0;
+    padding-left: 20px;
+    line-height: 1.8;
+}

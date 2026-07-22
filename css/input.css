@@ -1,0 +1,306 @@
+/* 输入区、发送者下拉、文件预览、文字格式工具栏 */
+.input-area {
+    padding: 16px 24px;
+    padding-bottom: max(16px, calc(12px + env(safe-area-inset-bottom)));
+    background-color: var(--sidebar-bg);
+    border-top: 1px solid #1a2a3a;
+}
+
+/* 发送者选择器 */
+.sender-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.sender-selector label {
+    font-size: 13px;
+    color: #aaa;
+}
+
+.sender-select {
+    display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .sender-select {
+        display: none;
+    }
+    .custom-dropdown {
+        display: block;
+    }
+}
+
+.custom-dropdown {
+    position: relative;
+    min-width: 180px;
+}
+
+.custom-dropdown-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--input-bg);
+    border: 2px solid #3a5a7a;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+.custom-dropdown-trigger img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.custom-dropdown-trigger .trigger-text {
+    flex: 1;
+}
+
+.custom-dropdown-trigger .arrow {
+    font-size: 10px;
+    transition: transform 0.2s;
+}
+
+.custom-dropdown.open .custom-dropdown-trigger .arrow {
+    transform: rotate(180deg);
+}
+
+.custom-dropdown-menu {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: var(--sidebar-bg);
+    border: 2px solid #3a5a7a;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    z-index: 100;
+}
+
+.custom-dropdown.open .custom-dropdown-menu {
+    display: block;
+}
+
+.dropdown-group-label {
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #888;
+    background-color: rgba(0,0,0,0.2);
+    font-weight: bold;
+}
+
+.dropdown-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+.dropdown-option:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.dropdown-option.selected {
+    background-color: rgba(0, 120, 212, 0.3);
+}
+
+.dropdown-option img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* 自己配置区 */
+.self-config {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 16px;
+    padding-left: 16px;
+    border-left: 1px solid #1a2a3a;
+}
+
+.self-config input {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: 2px solid #3a5a7a;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: inherit;
+    width: 80px;
+}
+
+.self-avatar-preview {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.self-avatar-input {
+    display: none;
+}
+
+/* 输入行 */
+.input-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    margin-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+.btn-file {
+    background-color: transparent;
+    color: var(--text-color);
+    border: 2px solid #3a5a7a;
+    padding: 10px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.btn-file:hover {
+    background-color: rgba(255,255,255,0.05);
+}
+
+.message-input {
+    flex: 1;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: 2px solid #3a5a7a;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: none;
+    min-height: 44px;
+    max-height: 120px;
+}
+
+.message-input:focus {
+    outline: none;
+    border-color: var(--btn-color);
+}
+
+.btn-send {
+    background-color: var(--btn-color);
+    color: white;
+    border: 2px solid #0078d4;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.btn-send:hover {
+    background-color: #0098e6;
+}
+
+/* 文件预览 */
+.file-preview {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.file-preview-item {
+    position: relative;
+    width: 60px;
+    height: 60px;
+}
+
+.file-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.file-preview-item .remove-file {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    background-color: #ff6b6b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.file-preview-item .file-icon {
+    width: 100%;
+    height: 100%;
+    background-color: var(--input-bg);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    text-align: center;
+    padding: 4px;
+    word-break: break-all;
+}
+
+/* 文字格式工具栏 */
+.text-format-toolbar {
+    display: flex;
+    gap: 4px;
+    padding: 6px 8px;
+    background-color: var(--sidebar-bg);
+    border: 1px solid #1a2a3a;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.text-format-toolbar .format-btn {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid #3a5a7a;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    min-width: 32px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.text-format-toolbar .format-btn:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.text-format-toolbar .format-btn.active {
+    background-color: var(--btn-color);
+    color: white;
+    border-color: var(--btn-color);
+}
+
+.text-format-toolbar .format-divider {
+    width: 1px;
+    height: 18px;
+    background-color: #3a5a7a;
+    margin: 0 2px;
+}

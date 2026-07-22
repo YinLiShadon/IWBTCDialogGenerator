@@ -1,0 +1,166 @@
+/* 颜色选择器弹窗 */
+.color-picker-panel {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    margin: 12px 0 16px 0;
+}
+
+.color-picker-panel .color-swatch {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.color-picker-panel .color-swatch:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+}
+
+.color-picker-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.color-picker-input-row input[type="text"] {
+    flex: 1;
+    padding: 6px 10px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid #3a5a7a;
+    border-radius: 4px;
+    font-family: inherit;
+}
+
+.color-picker-section-title {
+    color: var(--btn-color);
+    font-size: 13px;
+    margin: 8px 0 4px 0;
+}
+
+.color-picker-rgb-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 8px 0 4px 0;
+}
+
+.color-picker-rgb-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--input-bg);
+    border: 1px solid #3a5a7a;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+.color-picker-rgb-item label {
+    font-weight: 700;
+    font-size: 12px;
+    min-width: 14px;
+    text-align: center;
+}
+
+.color-picker-rgb-item.r label { color: #ff6b6b; }
+.color-picker-rgb-item.g label { color: #69db7c; }
+.color-picker-rgb-item.b label { color: #4dabf7; }
+
+.color-picker-rgb-item input[type="number"] {
+    flex: 1;
+    width: 100%;
+    padding: 4px 2px;
+    background-color: transparent;
+    color: var(--text-color);
+    border: none;
+    outline: none;
+    font-family: inherit;
+    -moz-appearance: textfield;
+}
+
+.color-picker-rgb-item input[type="number"]::-webkit-outer-spin-button,
+.color-picker-rgb-item input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.color-picker-preview {
+    width: 100%;
+    height: 28px;
+    border-radius: 4px;
+    border: 1px solid #3a5a7a;
+    margin: 8px 0 4px 0;
+    background-color: #FFFFFF;
+}
+
+/* 颜色自由选择面板：SV 色域方块 + 色相滑条 */
+.color-picker-sv-area {
+    position: relative;
+    width: 100%;
+    height: 160px;
+    background-color: #FF0000;
+    border-radius: 4px;
+    cursor: crosshair;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    margin-bottom: 8px;
+}
+
+.color-picker-sv-white {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to right, #FFFFFF, rgba(255,255,255,0));
+}
+
+.color-picker-sv-black {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, #000000, rgba(0,0,0,0));
+}
+
+.color-picker-sv-cursor {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(0,0,0,0.2);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    left: 0;
+    top: 0;
+}
+
+.color-picker-hue-track {
+    position: relative;
+    width: 100%;
+    height: 14px;
+    margin: 8px 0 4px 0;
+    background: linear-gradient(to right, #FF0000 0%, #FFFF00 16.67%, #00FF00 33.33%, #00FFFF 50%, #0000FF 66.67%, #FF00FF 83.33%, #FF0000 100%);
+    border-radius: 7px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+.color-picker-hue-cursor {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(0,0,0,0.2);
+    transform: translate(-50%, -50%);
+    top: 7px;
+    left: 0;
+    pointer-events: none;
+}
