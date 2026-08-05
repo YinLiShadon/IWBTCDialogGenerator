@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IWBTC Dialog Generator - 《我想成为创造者》(I wanna be the Creator) 对话编辑器</title>
+
+    <!-- CSS 模块 -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/messages.css">
+    <link rel="stylesheet" href="css/input.css">
+    <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/role-manager.css">
+    <link rel="stylesheet" href="css/color-picker.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 主聊天区域 -->
+        <div class="main-chat">
+            <div class="chat-header">
+                <input type="text" class="chat-title-input" id="chatTitleInput" value="IWBTC Dialog Generator" onclick="event.stopPropagation();" onkeydown="handleTitleKeydown(event)" onblur="handleTitleBlur()">
+                <div class="chat-header-actions">
+                    <button class="btn-select-messages" onclick="toggleMessageSelectionMode()">☑️ 选择</button>
+                    <button class="btn-undo" onclick="undoDelete()" title="撤销">↩️ 撤销</button>
+                    <button class="btn-redo" onclick="redoDelete()" title="重做">↪️ 重做</button>
+                    <button class="btn-clear" onclick="resetCurrentConversation()">🔄 重置</button>
+                    <button class="btn-export" onclick="showExportPreview()">📷 导出图片</button>
+                    <button class="btn-role-manager" onclick="showRoleManager()">👥 角色管理</button>
+                    <button class="btn-titles titles-on" id="btnTitles" onclick="toggleTitlesEnabled()" title="点击隐藏所有头衔">🏷️ 头衔</button>
+                    <button class="btn-guide" onclick="showGuideModal()">📖 使用指南</button>
+                    <button class="btn-changelog" onclick="showChangelogModal()">📝 更新日志</button>
+                    <button class="btn-about" onclick="showAboutModal()">ℹ️ 关于</button>
+                </div>
+            </div>
+            <div class="messages-container" id="messagesContainer">
+                <div class="loading-overlay" id="loadingOverlay">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text" id="loadingText">正在加载...</div>
+                    <div class="loading-progress">
+                        <div class="loading-progress-bar" id="loadingProgressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="input-area" id="inputArea">
+                <div class="sender-selector" style="margin-bottom: 8px;">
+                    <label>发送者：</label>
+                    <div class="custom-dropdown" id="senderDropdown">
+                        <div class="custom-dropdown-trigger" onclick="toggleSenderDropdown(event)">
+                            <img id="dropdownSelectedAvatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='24' fill='%23666'/%3E%3C/svg%3E" alt="">
+                            <span class="trigger-text" id="dropdownSelectedText">自己</span>
+                            <span class="arrow">▼</span>
+                        </div>
+                        <div class="custom-dropdown-menu" id="senderDropdownMenu"></div>
+                    </div>
+                    <select class="sender-select" id="senderSelect" onchange="onSenderChange()">
+                        <optgroup label="自己">
+                            <option value="self">自己</option>
+                        </optgroup>
+                        <optgroup label="旁白">
+                            <option value="narrator">旁白</option>
+                        </optgroup>
+                        <optgroup label="预设角色" id="presetRolesGroup"></optgroup>
+                        <optgroup label="自定义角色" id="customRolesGroup"></optgroup>
+                    </select>
+                    <div class="self-config" id="selfConfig">
+                        <img class="self-avatar-preview" id="selfAvatarPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='24' fill='%23666'/%3E%3C/svg%3E" alt="">
+                        <input type="file" class="self-avatar-input" id="selfAvatarInput" accept="image/*">
+                        <span onclick="document.getElementById('selfAvatarInput').click()" style="cursor:pointer;font-size:12px;">[换头像]</span>
+                        <input type="text" id="selfName" placeholder="我的名字" value="我">
+                    </div>
+                </div>
+                <div class="file-preview" id="filePreview"></div>
+                <input type="file" class="hidden-input" id="fileInput" multiple accept="image/*" onchange="onFileSelect()">
+                <div class="text-format-toolbar" id="textFormatToolbar">
+                    <button class="format-btn" data-format="bold" onclick="toggleTextFormat('bold')" title="粗体"><b>B</b></button>
+                    <button class="format-btn" data-format="italic" onclick="toggleTextFormat('italic')" title="斜体"><i>I</i></button>
+                    <button class="format-btn" data-format="underline" onclick="toggleTextFormat('underline')" title="下划线"><u>U</u></button>
+                    <button class="format-btn" data-format="strikethrough" onclick="toggleTextFormat('strikethrough')" title="删除线"><s>S</s></button>
+                    <span class="format-divider"></span>
+                    <button class="format-btn" onclick="showColorPickerModal('message')" title="文字颜色" style="min-width:auto; padding: 4px 8px;">🎨</button>
+                    <span class="format-divider"></span>
+                    <button class="format-btn" data-format="mosaic" onclick="toggleTextFormat('mosaic')" title="马赛克">▓</button>
+                    <button class="format-btn" data-format="reset" onclick="resetTextFormat()" title="清除格式">🧹</button>
+                    <span class="format-divider"></span>
+                    <button class="format-btn" onclick="insertDialogTitle()" title="插入小对话标题（用于分割对话区块）" style="min-width:auto; padding: 4px 10px;">📌 插入标题</button>
+                </div>
+                <div class="input-row">
+                    <button class="btn-file" onclick="document.getElementById('fileInput').click()">🖼️ <span>图片</span></button>
+                    <textarea class="message-input" id="messageInput" placeholder="输入消息..." rows="1" onkeydown="handleKeyDown(event)"></textarea>
+                    <button class="btn-send" onclick="sendMessage().catch(console.error)">➤ <span>发送</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新建对话模态框 -->
+    <div class="modal new-chat-modal" id="newChatModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">新建对话</span>
+                <button class="modal-close" onclick="closeModal('newChatModal')">&times;</button>
+            </div>
+            <input type="text" id="newChatName" placeholder="输入对话名称">
+            <button class="btn-create" onclick="createConversation()">➕ 创建</button>
+        </div>
+    </div>
+
+    <!-- 角色管理模态框 -->
+    <div class="modal" id="roleManagerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">角色管理</span>
+                <button class="modal-close" onclick="closeModal('roleManagerModal')">&times;</button>
+            </div>
+
+            <div class="role-section">
+                <h3>自己</h3>
+                <div class="role-grid" id="selfRolesGrid"></div>
+            </div>
+
+            <div class="role-section">
+                <h3>旁白</h3>
+                <div class="role-grid" id="narratorRolesGrid"></div>
+            </div>
+
+            <div class="role-section">
+                <h3>预设角色</h3>
+                <div id="presetRolesCategories"></div>
+            </div>
+
+            <div class="role-section">
+                <h3>自定义角色</h3>
+                <div id="customRolesCategories"></div>
+                <button class="btn-create-role" onclick="toggleCreateRoleForm()" style="margin-top:12px;">➕ 创建新角色</button>
+                <div class="create-role-form" id="createRoleForm">
+                    <div class="form-group">
+                        <label>角色分类</label>
+                        <input type="text" id="newRoleCategory" placeholder="输入角色分类，如：游戏角色">
+                    </div>
+                    <div class="form-group">
+                        <label>角色名称</label>
+                        <input type="text" id="newRoleName" placeholder="输入角色名称">
+                    </div>
+                    <div class="form-group">
+                        <label>角色头像</label>
+                        <div class="avatar-upload">
+                            <img id="newRoleAvatarPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%23666'/%3E%3C/svg%3E" alt="">
+                            <input type="file" id="newRoleAvatarInput" accept="image/*" onchange="onNewRoleAvatarChange()">
+                            <button class="btn-upload-avatar" onclick="document.getElementById('newRoleAvatarInput').click()">选择图片</button>
+                        </div>
+                    </div>
+                    <button class="btn-create-role" onclick="createCustomRole()">✔️ 确认创建</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 容器 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 图片预览模态框 -->
+    <div class="image-preview-modal" id="imagePreviewModal" onclick="closeImagePreview()">
+        <button class="close-btn" onclick="closeImagePreview()">✕</button>
+        <img id="imagePreviewContent" src="" alt="预览">
+    </div>
+
+    <!-- 导出预览模态框 -->
+    <div class="export-preview-modal" id="exportPreviewModal">
+        <div class="export-preview-header">
+            <div style="font-size: 20px; font-weight: bold; color: var(--text-color);">导出图片</div>
+            <div style="font-size: 13px; color: #888;">选择比例</div>
+            <div style="display: flex; justify-content: center; gap: 8px;">
+                <button class="aspect-ratio-btn" data-ratio="16:9" onclick="setExportPreviewRatio('16:9')">横屏</button>
+                <button class="aspect-ratio-btn" data-ratio="9:16" onclick="setExportPreviewRatio('9:16')">竖屏</button>
+            </div>
+            <div style="font-size: 13px; color: #888;">导出选项</div>
+            <div style="display: flex; justify-content: center; flex-direction: column; gap: 4px; max-width: 320px;">
+                <label class="export-section-option">
+                    <input type="checkbox" id="exportSplitByTitle" onchange="onExportOptionChange()">
+                    <span>按小对话标题分割裁剪（每段保存为单独图片）</span>
+                </label>
+            </div>
+        </div>
+        <div class="export-preview-content" id="exportPreviewContent"></div>
+        <div class="export-preview-actions">
+            <button class="btn-cancel" onclick="closeExportPreview()">✕ 取消</button>
+            <button class="btn-download" onclick="confirmExportImage()">⬇️ 下载</button>
+        </div>
+    </div>
+
+    <!-- 自定义确认对话框 -->
+    <div class="confirm-dialog-overlay" id="confirmDialogOverlay" style="display: none;">
+        <div class="confirm-dialog">
+            <div class="confirm-dialog-title" id="confirmDialogTitle">确认</div>
+            <div class="confirm-dialog-message" id="confirmDialogMessage">确定要执行此操作吗？</div>
+            <div class="confirm-dialog-buttons">
+                <button class="confirm-dialog-btn cancel" onclick="closeConfirmDialog(false)">✕ 取消</button>
+                <button class="confirm-dialog-btn confirm" onclick="closeConfirmDialog(true)">✔️ 确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 关于模态框（包含借物表） -->
+    <div class="modal" id="aboutModal">
+        <div class="modal-content about-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <span class="modal-title">关于</span>
+                <button class="modal-close" onclick="closeModal('aboutModal')">&times;</button>
+            </div>
+            <div style="text-align: center; padding: 20px;">
+                <h2>IWBTC Dialog Generator</h2>
+                <p class="version-line">版本 2026.07.22a</p>
+                <p>《我想成为创造者》(I wanna be the Creator) 对话编辑器 (二创工具)</p>
+                <p>你可以使用它来创建和编辑对话以制作IC二创内容！</p>
+                <p style="margin-top: 8px;">由 殷离Shadon 制作，使用 Trae AI 生成，使用 MiniMax-M3 模型</p>
+
+                <h3 style="margin-top: 20px; text-align: left;">借物表</h3>
+                <ul class="disclaimer-section" style="padding-left: 20px;">
+                    <li>预设角色图片：IC游戏解包文件</li>
+                    <li>字体 - 思源黑体 (Source Han Sans SC)：<a href="https://github.com/adobe-fonts/source-han-sans" target="_blank">github.com/adobe-fonts/source-han-sans</a></li>
+                    <li>字体 - Liberation Sans：<a href="https://github.com/liberationfonts/liberation-fonts" target="_blank">github.com/liberationfonts/liberation-fonts</a></li>
+                </ul>
+
+                <h3 style="margin-top: 20px; text-align: left;">免责声明</h3>
+                <p class="disclaimer-section">1. 仅供娱乐，请勿过度解读</p>
+                <p class="disclaimer-section">2. 角色图片来源于游戏解包和网络，本人不具有上述图片版权</p>
+                <p class="disclaimer-section">3. 此工具与AikesiX和游戏《我想成为创造者》(I wanna be the Creator) 无直接关联</p>
+
+                <h3 style="margin-top: 20px; text-align: left;">灵感来源</h3>
+                <p class="disclaimer-section">1. 仿照微信、QQ聊天界面的工具</p>
+                <p class="disclaimer-section">2. Yuzutalk/Momotalk (蔚蓝档案对话编辑器)：<a href="https://www.yuzutalk.net/" target="_blank">yuzutalk.net</a>，<a href="https://u1805.github.io/momotalk/" target="_blank">u1805.github.io/momotalk</a></p>
+                <p class="disclaimer-section">3. Closure Talk (明日方舟与蔚蓝档案对话编辑器)：<a href="https://closuretalk.github.io/" target="_blank">closuretalk.github.io</a></p>
+                <p class="disclaimer-section">4. MayerTalk (明日方舟对话编辑器)：<a href="https://www.mayertalk.top/" target="_blank">mayertalk.top</a></p>
+
+                <p style="margin-top: 16px;"><a class="repo-link" href="https://github.com/YinLiShadon/IWBTCDialogGenerator" target="_blank">GitHub 仓库</a></p>
+                <p style="color: #888; font-size: 12px; margin-top: 20px;">© 2026 殷离Shadon</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 使用指南模态框 -->
+    <div class="modal" id="guideModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <span class="modal-title">使用指南</span>
+                <button class="modal-close" onclick="closeModal('guideModal')">&times;</button>
+            </div>
+            <div class="guide-content">
+                <h3>功能介绍</h3>
+                <ul>
+                    <li><strong>发送消息：</strong>选择发送者（自己/旁白/预设/自定义角色），输入消息内容并发送</li>
+                    <li><strong>删除消息：</strong>使用"选择"模式勾选后删除，或直接点击删除按钮</li>
+                    <li><strong>撤消/重做：</strong>支持撤消和重做最近的操作</li>
+                    <li><strong>导出图片：</strong>点击"导出图片"可生成带样式的对话截图，可选按小对话标题分割为多张图</li>
+                    <li><strong>角色管理：</strong>可添加、编辑、删除自定义角色；可重命名预设角色（仅显示名）</li>
+                    <li><strong>头衔功能：</strong>为自己/预设/自定义角色设置彩色头衔徽章；点击顶栏"🏷️ 头衔"按钮可全局隐藏</li>
+                    <li><strong>重命名对话：</strong>点击顶部对话名称可直接修改</li>
+                    <li><strong>小对话标题：</strong>点击工具栏"插入标题"可添加分割标题，导出图片时可按此分割</li>
+                    <li><strong>文字格式：</strong>输入框上方工具栏：选中文本后点击 <b>B</b>（粗）/ <i>I</i>（斜）/ <u>U</u>（下划线）/ <s>S</s>（删除线）/ 🎨（颜色选择）/ ▓（马赛克）/ 🧹（清除）</li>
+                </ul>
+                <h3>快捷操作</h3>
+                <ul>
+                    <li><strong>Enter：</strong>发送消息</li>
+                    <li><strong>Shift+Enter：</strong>换行</li>
+                    <li><strong>Ctrl+Z：</strong>撤消</li>
+                    <li><strong>Ctrl+Y：</strong>重做</li>
+                </ul>
+                <h3>使用提示</h3>
+                <ul>
+                    <li>自己的头像和名称、大小对话名称可直接点击编辑</li>
+                    <li>选择模式支持多选批量删除</li>
+                    <li>预设角色重命名不影响文件名（仅显示名）</li>
+                    <li>导出图片选择"按小对话标题分割"时，每段会保存为独立图片</li>
+                    <li>头衔徽章的颜色可自定义，文字色会根据背景亮度自动反色</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 更新日志模态框 -->
+    <div class="modal" id="changelogModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <span class="modal-title">更新日志</span>
+                <button class="modal-close" onclick="closeModal('changelogModal')">&times;</button>
+            </div>
+            <div class="changelog-content">
+                <h3>版本 2026.07.22a</h3>
+                <ul>
+                    <li>更改字体加载方式，改为模块化设计，添加借物表、头衔功能(可自定义)</li>
+                </ul>
+                <h3>版本 2026.07.15a</h3>
+                <ul>
+                    <li>添加新字体加载方式、新颜色选择面板</li>
+                </ul>
+                <h3>版本 2026.07.14b</h3>
+                <ul>
+                    <li>更新【简介】【使用指南】、顶部标题样式</li>
+                    <li>添加文字个性化、小对话、编辑预设角色名称、导出图片按小对话裁剪功能</li>
+                </ul>
+                <h3>版本 2026.07.14a</h3>
+                <ul>
+                    <li>修复移动端无法选择发送者的BUG，添加正在加载对话提醒和进度</li>
+                </ul>
+                <h3>版本 2026.07.13b</h3>
+                <ul>
+                    <li>更改介绍、导出图片的名字格式</li>
+                    <li>添加【使用指南】、【更新日志】、按钮图标、快捷键操作、导出图片显示版本号功能</li>
+                    <li>适配移动设备</li>
+                </ul>
+                <h3>版本 2026.07.13a</h3>
+                <ul>
+                    <li>发布本工具</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑自己信息模态框（包含头衔编辑） -->
+    <div class="modal" id="editSelfModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <span class="modal-title">编辑自己</span>
+                <button class="modal-close" onclick="closeModal('editSelfModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>名称</label>
+                <input type="text" id="editSelfName" placeholder="输入名称">
+            </div>
+            <div class="form-group">
+                <label>头像</label>
+                <div class="avatar-upload">
+                    <img id="editSelfAvatarPreview" src="" alt="">
+                    <input type="file" id="editSelfAvatarInput" accept="image/*" onchange="onEditSelfAvatarChange()">
+                    <button class="btn-upload-avatar" onclick="document.getElementById('editSelfAvatarInput').click()">选择图片</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>头衔（可选，显示在名字旁的彩色徽章）</label>
+                <div class="title-input-row">
+                    <input type="text" id="editTitleText" placeholder="输入头衔文字" maxlength="20" oninput="onEditingTitleTextChange(this.value)">
+                    <button class="btn-title-color" id="editTitleColorBtn" type="button" title="选择头衔颜色" onclick="showColorPickerModal('title')"></button>
+                </div>
+            </div>
+            <button class="btn-create-role" onclick="saveSelfEdit()">✔️ 保存</button>
+        </div>
+    </div>
+
+    <!-- 插入小对话标题模态框 -->
+    <div class="modal" id="insertDialogTitleModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <span class="modal-title">📌 插入小对话标题</span>
+                <button class="modal-close" onclick="closeModal('insertDialogTitleModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>小标题文字</label>
+                <input type="text" id="insertDialogTitleInput" placeholder="例如：场景一、相识、战斗开始..." maxlength="50" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmInsertDialogTitle();}">
+                <div class="preset-original-name" style="margin-top: 6px;">小标题用于分割对话区块，导出图片时可按此分割</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-create-role" onclick="closeModal('insertDialogTitleModal')" style="flex:1; background-color: #555;">✕ 取消</button>
+                <button class="btn-create-role" onclick="confirmInsertDialogTitle()" style="flex:1;">✔️ 确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑预设角色模态框（包含头衔编辑） -->
+    <div class="modal" id="editPresetRoleModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <span class="modal-title">编辑预设角色</span>
+                <button class="modal-close" onclick="closeModal('editPresetRoleModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>名称（仅显示名，原始名不变）</label>
+                <input type="text" id="editPresetRoleName" placeholder="输入新的角色名称">
+                <div class="preset-original-name" id="presetOriginalName"></div>
+            </div>
+            <div class="form-group">
+                <label>头像（不可更改）</label>
+                <div class="avatar-upload">
+                    <img id="editPresetRoleAvatarPreview" src="" alt="">
+                    <span class="avatar-readonly-hint">预设角色头像不可更改</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>头衔（可选）</label>
+                <div class="title-input-row">
+                    <input type="text" id="editTitleText" placeholder="输入头衔文字" maxlength="20" oninput="onEditingTitleTextChange(this.value)">
+                    <button class="btn-title-color" id="editTitleColorBtn" type="button" title="选择头衔颜色" onclick="showColorPickerModal('title')"></button>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-create-role" onclick="resetPresetRoleName()" style="flex:1; background-color: #d32f2f;">🧹 还原默认名</button>
+                <button class="btn-create-role" onclick="savePresetRoleEdit()" style="flex:1;">✔️ 确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑自定义角色模态框（包含头衔编辑） -->
+    <div class="modal" id="editCustomRoleModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <span class="modal-title">编辑角色</span>
+                <button class="modal-close" onclick="closeModal('editCustomRoleModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>名称</label>
+                <input type="text" id="editCustomRoleName" placeholder="输入名称">
+            </div>
+            <div class="form-group">
+                <label>分类</label>
+                <input type="text" id="editCustomRoleCategory" placeholder="输入分类">
+            </div>
+            <div class="form-group">
+                <label>头像</label>
+                <div class="avatar-upload">
+                    <img id="editCustomRoleAvatarPreview" src="" alt="">
+                    <input type="file" id="editCustomRoleAvatarInput" accept="image/*" onchange="onEditCustomRoleAvatarChange()">
+                    <button class="btn-upload-avatar" onclick="document.getElementById('editCustomRoleAvatarInput').click()">选择图片</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>头衔（可选）</label>
+                <div class="title-input-row">
+                    <input type="text" id="editTitleText" placeholder="输入头衔文字" maxlength="20" oninput="onEditingTitleTextChange(this.value)">
+                    <button class="btn-title-color" id="editTitleColorBtn" type="button" title="选择头衔颜色" onclick="showColorPickerModal('title')"></button>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-create-role" onclick="confirmDeleteCustomRole()" style="flex:1; background-color: #d32f2f;">🗑️ 删除</button>
+                <button class="btn-create-role" onclick="saveCustomRoleEdit()" style="flex:1;">✔️ 确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 颜色选择器模态框 -->
+    <div class="modal" id="colorPickerModal">
+        <div class="modal-content" style="max-width: 440px;">
+            <div class="modal-header">
+                <span class="modal-title">🎨 颜色选择</span>
+                <button class="modal-close" onclick="closeColorPickerModal()">&times;</button>
+            </div>
+            <div style="padding: 4px 4px 0 4px;">
+                <div class="color-picker-section-title">颜色自由选择</div>
+                <div class="color-picker-sv-area" id="colorPickerSVArea">
+                    <div class="color-picker-sv-white"></div>
+                    <div class="color-picker-sv-black"></div>
+                    <div class="color-picker-sv-cursor" id="colorPickerSVCursor"></div>
+                </div>
+                <div class="color-picker-hue-track" id="colorPickerHueTrack">
+                    <div class="color-picker-hue-cursor" id="colorPickerHueCursor"></div>
+                </div>
+                <div class="color-picker-rgb-row">
+                    <div class="color-picker-rgb-item r">
+                        <label>R</label>
+                        <input type="number" id="colorPickerR" min="0" max="255" step="1" value="255" oninput="onColorRgbInput()">
+                    </div>
+                    <div class="color-picker-rgb-item g">
+                        <label>G</label>
+                        <input type="number" id="colorPickerG" min="0" max="255" step="1" value="255" oninput="onColorRgbInput()">
+                    </div>
+                    <div class="color-picker-rgb-item b">
+                        <label>B</label>
+                        <input type="number" id="colorPickerB" min="0" max="255" step="1" value="255" oninput="onColorRgbInput()">
+                    </div>
+                </div>
+                <div class="color-picker-input-row">
+                    <input type="text" id="colorPickerHex" placeholder="如 #FF6B6B" maxlength="7" oninput="onColorHexInput(this.value)">
+                </div>
+                <div class="color-picker-preview" id="colorPickerPreview"></div>
+                <div class="color-picker-section-title">基础色</div>
+                <div class="color-picker-panel" id="colorPickerBasic"></div>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button class="btn-create-role" onclick="closeColorPickerModal()" style="flex:1; background-color: #555;">✕ 取消</button>
+                <button class="btn-create-role" onclick="confirmColorPicker()" style="flex:1;">✔️ 应用</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- html2canvas (导出图片用) -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <!-- JS 模块（按依赖顺序加载；不使用 ES Modules 以兼容 file:// 协议） -->
+    <script src="js/config.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/fonts.js"></script>
+    <script src="js/titles.js"></script>
+    <script src="js/roles.js"></script>
+    <script src="js/conversations.js"></script>
+    <script src="js/messages.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/sender.js"></script>
+    <script src="js/color-picker.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/toasts.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

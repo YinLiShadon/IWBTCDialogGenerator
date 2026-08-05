@@ -1,0 +1,128 @@
+/* 角色管理界面 */
+.role-section {
+    margin-bottom: 24px;
+}
+
+.role-section h3 {
+    font-size: 14px;
+    color: #aaa;
+    margin-bottom: 12px;
+}
+
+.role-category {
+    margin-bottom: 16px;
+}
+
+.role-category h4 {
+    font-size: 12px;
+    color: #888;
+    margin: 8px 0;
+}
+
+.role-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+}
+
+.role-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    background-color: var(--input-bg);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.role-item:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.role-item img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+.role-item span {
+    font-size: 12px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+/* 角色项中的头衔小标识 */
+.role-item .role-title-indicator {
+    display: inline-block;
+    font-size: 9px;
+    padding: 1px 4px;
+    border-radius: 6px;
+    margin-top: 4px;
+    color: #fff;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 新建角色表单 */
+.create-role-form {
+    display: none;
+    background-color: var(--input-bg);
+    padding: 16px;
+    border-radius: 8px;
+    margin-top: 16px;
+}
+
+.create-role-form.active {
+    display: block;
+}
+
+/* 角色项操作按钮 */
+.role-item-actions {
+    display: flex;
+    gap: 2px;
+    margin-top: 4px;
+}
+
+.role-item-actions button {
+    background-color: transparent;
+    color: #aaa;
+    border: 1px solid #3a5a7a;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 10px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.role-item-actions button:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+/* 预设角色原名提示 */
+.preset-original-name {
+    color: #888;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.avatar-readonly-hint {
+    display: inline-block;
+    margin-top: 8px;
+    color: #888;
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* 预设角色头像预览（不可点击） */
+#editPresetRoleAvatarPreview {
+    cursor: not-allowed;
+    opacity: 0.85;
+}
